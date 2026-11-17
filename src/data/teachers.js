@@ -19,7 +19,22 @@ export const TEACHERS_LIST = [
   'Cô Trần Thị Mỹ Quỳnh',
   'Cô Hồ Thị Kim Huệ',
   'Thầy Ian Michael Biggar',
-  'Thầy Joseph Wallace Wisham III'
+  'Thầy Joseph Wallace Wisham III',
+  'Thầy Trần Lê Anh Minh',
+  'Cô Nguyễn Thị Tỉnh',
+  'Cô Lê Thị Hồng Hoa',
+  'Thầy Đoàn Kim Hóa',
+  'Cô Nguyễn Thị Anh Sen',
+  'Cô Nguyễn Thị Huỳnh Như',
+  'Cô Hồ Thị Mỹ Nhung',
+  'Thầy Hồ Vân Khanh',
+  'Cô Ngô Thị Huệ',
+  'Cô Nguyễn Thị Như Thảo',
+  'Thầy Nguyễn Hoàng Bảo Long',
+  'Cô Nguyễn Thị Hồng Nhung',
+  'Cô Lê Thị Hồng Ngọc',
+  'Cô Phạm Thị Thanh Hằng',
+  'Thầy Nguyễn Trần Bảo Quân'
 ];
 
 /**
