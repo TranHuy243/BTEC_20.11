@@ -5,7 +5,7 @@
  */
 
 export const CARD_WIDTH = 1024;
-export const CARD_HEIGHT = 571; // Tỷ lệ chuẩn theo ảnh Mẫu 1
+export const CARD_HEIGHT = 576; // Chuẩn tỷ lệ 16:9 của cả 3 mẫu thiệp mới
 
 export const WISH_TOPICS = [
   {
@@ -29,17 +29,17 @@ export const FRAME_STYLES = [
   {
     id: 'luxury_cream',
     name: 'Mẫu 1',
-    desc: 'Thiệp cô giáo áo vàng và hoa cúc mùa thu ấm áp'
+    desc: 'Thiệp cô giáo áo vàng trên nền kem, viền xanh trang nhã'
   },
   {
     id: 'collegiate_navy',
     name: 'Mẫu 2',
-    desc: 'Thiệp vòm xanh trang nhã, hoa cúc ấm áp ngày 20/11'
+    desc: 'Thiệp bìa xanh lá đậm, sách mở và bó hoa cúc ấm áp'
   },
   {
     id: 'slate_chalk',
     name: 'Mẫu 3',
-    desc: 'Khung viền rêu nhã nhặn, họa tiết lá thu tinh tế ngày 20/11'
+    desc: 'Thiệp vòm kem cô giáo áo vàng trên nền xanh nhã nhặn'
   }
 ];
 
@@ -67,7 +67,7 @@ function loadFrame1Image() {
     img.onerror = () => {
       resolve(null);
     };
-    img.src = '/frames/frame_mau_1.jpg?v=2';
+    img.src = '/frames/frame_mau_1.jpg?v=5';
   });
 }
 
@@ -85,7 +85,7 @@ function loadFrame2Image() {
     img.onerror = () => {
       resolve(null);
     };
-    img.src = '/frames/frame_mau_2.jpg?v=3';
+    img.src = '/frames/frame_mau_2.jpg?v=5';
   });
 }
 
@@ -103,7 +103,7 @@ function loadFrame3Image() {
     img.onerror = () => {
       resolve(null);
     };
-    img.src = '/frames/frame_mau_3.jpg?v=2';
+    img.src = '/frames/frame_mau_3.jpg?v=5';
   });
 }
 
@@ -198,413 +198,189 @@ export async function renderCardOnCanvas(canvas, data) {
 }
 
 /**
- * Vẽ chữ khớp chính xác vào các dòng kẻ của MẪU 1 (Cô giáo & Hoa cúc)
- * Tất cả các dòng kẻ đều thống nhất thành dòng chấm bi (........)
- * Cỡ chữ nhãn (Gửi đến:, Lời chúc:, Người gửi:) và nội dung lời chúc đồng nhất 22px.
+ * Vẽ chữ khớp chính xác vào các dòng kẻ của MẪU 1 (Cô giáo áo vàng & Banner xanh)
+ * Nhãn Gửi đến:, Lời chúc:, Người gửi: đã có sẵn trên ảnh với font đồng nhất.
+ * Cỡ chữ nội dung lời chúc đồng nhất (>= 22px) theo yêu cầu.
  */
 function drawTemplate1Content(ctx, data) {
   ctx.save();
 
-  // Đảm bảo các dòng đều là chấm bi (........) đồng nhất
-  const drawDots = (y, startX, endX) => {
-    ctx.save();
-    ctx.fillStyle = '#FCF5EB'; // Phủ nền kem che đường thẳng cũ nếu có
-    ctx.fillRect(startX - 2, y - 2, (endX - startX) + 4, 4);
-    ctx.strokeStyle = '#231C12';
-    ctx.lineWidth = 1.5;
-    ctx.setLineDash([1.5, 4.5]);
-    ctx.beginPath();
-    ctx.moveTo(startX, y);
-    ctx.lineTo(endX, y);
-    ctx.stroke();
-    ctx.restore();
-  };
-
-  // Thống nhất các dòng 1, 2, 7 thành dòng chấm bi
-  drawDots(223, 226, 650);
-  drawDots(260, 230, 650);
-  drawDots(445, 246, 650);
-
   // 1. Tên Thầy/Cô (Nằm trên dòng chấm sau chữ "Gửi đến:")
   let teacherFontSize = 22;
   ctx.textAlign = 'left';
   ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
-  ctx.fillStyle = '#1A4329'; // Màu xanh đậm tiệp với màu tiêu đề "Nhà Giáo Việt Nam"
+  ctx.fillStyle = '#164329'; // Màu xanh đậm tiệp màu banner tiêu đề
   const teacher = data.teacher_name ? data.teacher_name.trim() : 'Thầy/Cô kính mến';
-  while (ctx.measureText(teacher).width > 410 && teacherFontSize > 13) {
+  while (ctx.measureText(teacher).width > 460 && teacherFontSize > 13) {
     teacherFontSize--;
     ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
   }
-  ctx.fillText(teacher, 232, 218);
+  ctx.fillText(teacher, 176, 200);
 
-  // 2. Nội dung lời chúc (Đồng nhất cỡ chữ 22px, bằng hoặc to hơn nhãn)
-  ctx.fillStyle = '#2A2522';
-  ctx.font = CARD_WISH_FONT;
+  // 2. Nội dung lời chúc (Đồng nhất cỡ chữ 22px, dàn đều trên các dòng chấm có sẵn)
+  ctx.fillStyle = '#231C12';
+  let wishFontSize = 22;
+  ctx.font = `italic ${wishFontSize}px "Times New Roman", Georgia, serif`;
 
-  const defaultMsg = 'Nhân ngày 20/11, em xin kính chúc Thầy/Cô luôn dồi dào sức khỏe, ngập tràn niềm vui và luôn giữ trọn nhiệt huyết trong sự nghiệp trồng người!';
+  const defaultMsg = 'Nhân ngày 20/11, em xin kính chúc Thầy/Cô luôn dồi dào sức khỏe, ngập tràn niềm vui và luôn giữ trọn nhiệt huyết trong từng giờ lên lớp!';
   const rawText = data.message ? data.message.trim() : defaultMsg;
 
-  // Dàn dòng thông minh: dòng 1 max 405px (bắt đầu từ x=238), các dòng sau max 510px (bắt đầu từ x=135)
-  const words = rawText.split(/\s+/);
-  const lines = [];
-  let currentLine = '';
-  let lineIdx = 0;
+  // Dàn trên 5 dòng chấm có sẵn trên ảnh
+  const dottedY = [288, 325, 364, 401, 440];
+  const maxW = 585;
 
-  for (let i = 0; i < words.length; i++) {
-    const word = words[i];
-    const testLine = currentLine ? currentLine + ' ' + word : word;
-    const maxW = lineIdx === 0 ? 405 : 510;
-    const w = ctx.measureText(testLine).width;
-
-    if (w <= maxW) {
-      currentLine = testLine;
-    } else {
-      if (currentLine) lines.push(currentLine);
-      currentLine = word;
-      lineIdx++;
-      if (lineIdx >= 5) break; // Tối đa 5 dòng lời chúc
-    }
-  }
-  if (currentLine && lines.length < 5) {
-    lines.push(currentLine);
+  let lines = wrapText(ctx, rawText, maxW);
+  while (lines.length > dottedY.length && wishFontSize > 15) {
+    wishFontSize--;
+    ctx.font = `italic ${wishFontSize}px "Times New Roman", Georgia, serif`;
+    lines = wrapText(ctx, rawText, maxW);
   }
 
-  // Dòng 1 (sau chữ "Lời chúc:")
-  if (lines[0]) {
-    ctx.fillText(lines[0], 238, 255);
+  for (let i = 0; i < Math.min(lines.length, dottedY.length); i++) {
+    ctx.fillText(lines[i], 60, dottedY[i]);
   }
 
-  // Các dòng 2, 3, 4, 5 (trên 4 dòng chấm bi)
-  const dottedY = [291, 328, 365, 402];
-  for (let i = 1; i < lines.length; i++) {
-    if (dottedY[i - 1]) {
-      ctx.fillText(lines[i], 135, dottedY[i - 1]);
-    }
-  }
-
-  // 3. Người gửi
+  // 3. Người gửi (Nằm trên dòng chấm sau chữ "Người gửi:")
   let senderFontSize = 22;
   ctx.font = `bold ${senderFontSize}px "Times New Roman", Georgia, serif`;
-  ctx.fillStyle = '#1A4329';
+  ctx.fillStyle = '#164329';
   const sender = data.is_anonymous 
     ? 'Một sinh viên BTEC FPT' 
     : (data.sender_name && data.sender_name.trim() ? data.sender_name.trim() : 'Học trò BTEC FPT');
-  while (ctx.measureText(sender).width > 390 && senderFontSize > 13) {
+  while (ctx.measureText(sender).width > 340 && senderFontSize > 13) {
     senderFontSize--;
     ctx.font = `bold ${senderFontSize}px "Times New Roman", Georgia, serif`;
   }
-  ctx.fillText(sender, 252, 440);
+  ctx.fillText(sender, 188, 504);
 
   ctx.restore();
 }
 
 /**
- * Vẽ chữ khớp chính xác vào các dòng chấm của MẪU 2 (Vòm Xanh Tri Ân)
- * Căn chỉnh thông minh vị trí nhãn "Người gửi:" và tên người gửi:
- * - Nếu tên ngắn: "Người gửi:" ở vị trí mặc định, tên nằm sát ngay sau nó.
- * - Nếu tên dài: Cả cụm tự động dịch dần sang bên trái để không tụt khỏi lề phải (890px),
- *   đồng thời tên vẫn luôn sát lề với "Người gửi:", không bao giờ bị đè lên nhau.
+ * Vẽ chữ khớp chính xác vào các dòng chấm của MẪU 2 (Bìa Xanh Sách & Hoa Cúc)
+ * Màu chữ kem sáng nổi bật trang nhã trên nền xanh lá đậm.
  */
 function drawTemplate2Content(ctx, data) {
   ctx.save();
 
-  // Phủ nền che hoàn toàn các chữ thư pháp "Gửi đến:", "Lời chúc:" cũ trên ảnh mẫu (từ x=448 bao gồm nét chữ uốn lượn)
-  ctx.save();
-  ctx.fillStyle = '#F6F0E2';
-  ctx.fillRect(448, 130, 140, 40); // Che toàn bộ cụm "Gửi đến:" bao gồm chữ G thư pháp
-  ctx.fillRect(448, 172, 140, 40); // Che toàn bộ cụm "Lời chúc:" bao gồm chữ L thư pháp
-  ctx.restore();
-
-  // Vẽ 2 nhãn đầu với cùng 1 font và 1 size đồng nhất với Mẫu 1 & Mẫu 3
-  ctx.textAlign = 'left';
-  ctx.fillStyle = CARD_LABEL_COLOR;
-  ctx.font = CARD_LABEL_FONT;
-  ctx.fillText('Gửi đến:', 480, 161);
-  ctx.fillText('Lời chúc:', 480, 203);
-
   // 1. Tên Thầy/Cô (Nằm trên dòng chấm sau chữ "Gửi đến:")
-  ctx.textAlign = 'left';
   let teacherFontSize = 22;
+  ctx.textAlign = 'left';
   ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
-  ctx.fillStyle = '#1A4329';
+  ctx.fillStyle = '#FFFDF0'; // Màu kem ngà sáng nổi bật trên nền xanh đậm
   const teacher = data.teacher_name && data.teacher_name.trim() ? data.teacher_name.trim() : 'Thầy/Cô kính mến';
-  while (ctx.measureText(teacher).width > 280 && teacherFontSize > 13) {
+  while (ctx.measureText(teacher).width > 400 && teacherFontSize > 13) {
     teacherFontSize--;
     ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
   }
-  ctx.fillText(teacher, 605, 161);
+  ctx.fillText(teacher, 176, 246);
 
-  // 2. Nội dung lời chúc (Đồng nhất cỡ chữ 22px, bằng hoặc to hơn nhãn)
-  ctx.fillStyle = '#2A2522';
-  ctx.font = CARD_WISH_FONT;
+  // 2. Nội dung lời chúc (Màu kem sáng, dàn trên các dòng chấm)
+  ctx.fillStyle = '#FEF7DE';
+  let wishFontSize = 22;
+  ctx.font = `italic ${wishFontSize}px "Times New Roman", Georgia, serif`;
 
   const defaultMsg = 'Nhân ngày 20/11, em xin kính chúc Thầy/Cô luôn dồi dào sức khỏe, ngập tràn niềm vui và luôn giữ trọn nhiệt huyết trong từng giờ lên lớp!';
   const rawText = data.message ? data.message.trim() : defaultMsg;
 
-  // Dàn dòng khớp các dòng chấm: dòng 1 sau chữ "Lời chúc:", các dòng sau theo độ rộng vòm
-  const wishLineConfigs = [
-    { startX: 605, maxW: 280, y: 203 }, // Dòng 1 (sau chữ Lời chúc:)
-    { startX: 445, maxW: 440, y: 246 }, // Dòng 2
-    { startX: 415, maxW: 470, y: 292 }, // Dòng 3
-    { startX: 415, maxW: 470, y: 334 }, // Dòng 4
-    { startX: 415, maxW: 470, y: 376 }, // Dòng 5
-    { startX: 415, maxW: 470, y: 420 }, // Dòng 6
-    { startX: 415, maxW: 470, y: 462 }  // Dòng 7
-  ];
+  const dottedY = [337, 377, 415];
+  const maxW = 580;
 
-  const words = rawText.split(/\s+/);
-  const lines = [];
-  let currentLine = '';
-  let lineIdx = 0;
-
-  for (let i = 0; i < words.length; i++) {
-    const word = words[i];
-    const testLine = currentLine ? currentLine + ' ' + word : word;
-    const maxW = wishLineConfigs[lineIdx] ? wishLineConfigs[lineIdx].maxW : 470;
-    const w = ctx.measureText(testLine).width;
-
-    if (w <= maxW) {
-      currentLine = testLine;
-    } else {
-      if (currentLine) lines.push(currentLine);
-      currentLine = word;
-      lineIdx++;
-      if (lineIdx >= wishLineConfigs.length) break;
+  let lines = wrapText(ctx, rawText, maxW);
+  if (lines.length > 3) {
+    while (lines.length > 4 && wishFontSize > 15) {
+      wishFontSize--;
+      ctx.font = `italic ${wishFontSize}px "Times New Roman", Georgia, serif`;
+      lines = wrapText(ctx, rawText, maxW);
     }
   }
-  if (currentLine && lines.length < wishLineConfigs.length) {
-    lines.push(currentLine);
+
+  for (let i = 0; i < Math.min(lines.length, 4); i++) {
+    const y = i < 3 ? dottedY[i] : 453;
+    if (i === 3) {
+      // Vẽ thêm dòng chấm phụ thứ 4 nếu nội dung dài
+      ctx.save();
+      ctx.strokeStyle = '#DCD3BE';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([1.5, 4.5]);
+      ctx.beginPath();
+      ctx.moveTo(60, 456);
+      ctx.lineTo(60 + maxW, 456);
+      ctx.stroke();
+      ctx.restore();
+    }
+    ctx.fillText(lines[i], 60, y);
   }
 
-  lines.forEach((line, idx) => {
-    const cfg = wishLineConfigs[idx];
-    if (cfg) {
-      ctx.fillText(line, cfg.startX, cfg.y);
-    }
-  });
-
-  // 3. Người gửi
-  // Cơ chế tự động căn lề thông minh theo yêu cầu:
-  // "nếu người gửi điền tên nó sẽ tự động sát lề với cụm từ người gửi còn nếu tên quá dài thì sẽ đẩy dần qua phía bên trái để nó không tụt khỏi lề hoặc bị đè lên chữ người gửi"
-  const RIGHT_BOUND = 890;
-  const DEFAULT_LABEL_X = 648;
-  const MIN_LABEL_X = 380;
-  const labelText = 'Người gửi:';
-
-  const senderRaw = data.is_anonymous
-    ? 'Một sinh viên BTEC FPT'
-    : (data.sender_name && data.sender_name.trim() ? data.sender_name.trim() : 'Học trò BTEC FPT');
-
-  // Đo chiều rộng nhãn và tên người gửi với font chuẩn 22px
-  ctx.font = CARD_LABEL_FONT;
-  const labelW = ctx.measureText(labelText).width;
-  const gap = 8;
-
+  // 3. Người gửi (Nằm trên dòng chấm sau chữ "Người gửi:")
   let senderFontSize = 22;
   ctx.font = `bold ${senderFontSize}px "Times New Roman", Georgia, serif`;
-  let nameW = ctx.measureText(senderRaw).width;
-
-  // Giới hạn an toàn chiều rộng tổng
-  const maxAllowedW = RIGHT_BOUND - MIN_LABEL_X;
-  while ((labelW + gap + nameW) > maxAllowedW && senderFontSize > 13) {
+  ctx.fillStyle = '#FFFDF0';
+  const sender = data.is_anonymous
+    ? 'Một sinh viên BTEC FPT'
+    : (data.sender_name && data.sender_name.trim() ? data.sender_name.trim() : 'Học trò BTEC FPT');
+  while (ctx.measureText(sender).width > 325 && senderFontSize > 13) {
     senderFontSize--;
     ctx.font = `bold ${senderFontSize}px "Times New Roman", Georgia, serif`;
-    nameW = ctx.measureText(senderRaw).width;
   }
-
-  const totalW = labelW + gap + nameW;
-  const defaultEndX = DEFAULT_LABEL_X + totalW;
-
-  let labelX;
-  if (defaultEndX <= RIGHT_BOUND) {
-    // Tên ngắn: "Người gửi:" giữ nguyên tại vị trí mặc định 648, tên nằm sát ngay sau nó
-    labelX = DEFAULT_LABEL_X;
-  } else {
-    // Tên dài: Cả cụm dịch dần sang bên trái để điểm kết thúc chạm đúng lề phải (890px),
-    // tên vẫn luôn sát ngay sau nhãn "Người gửi:" nên tuyệt đối không bị đè lên nhau
-    labelX = Math.max(MIN_LABEL_X, RIGHT_BOUND - totalW);
-  }
-  const nameX = labelX + labelW + gap;
-
-  // Phủ màu nền kem che phần dòng "Người gửi: ......" có sẵn trên ảnh mẫu
-  ctx.save();
-  ctx.fillStyle = '#F6F0E2';
-  ctx.fillRect(MIN_LABEL_X - 10, 495, (RIGHT_BOUND - MIN_LABEL_X) + 25, 38);
-
-  // Vẽ hàng chấm bi (........) ở dưới chân người gửi kéo dài từ sau "Người gửi:" đến hết lề phải
-  ctx.strokeStyle = '#231C12';
-  ctx.lineWidth = 1.5;
-  ctx.setLineDash([1.5, 4.5]);
-  ctx.beginPath();
-  ctx.moveTo(labelX + labelW + 4, 522);
-  ctx.lineTo(RIGHT_BOUND, 522);
-  ctx.stroke();
-
-  // Vẽ nhãn "Người gửi:" cùng 1 font và 1 size
-  ctx.fillStyle = CARD_LABEL_COLOR;
-  ctx.font = CARD_LABEL_FONT;
-  ctx.textAlign = 'left';
-  ctx.fillText(labelText, labelX, 516);
-
-  // Vẽ tên người gửi (sát ngay sau "Người gửi:")
-  ctx.fillStyle = '#1A4329';
-  ctx.font = `bold ${senderFontSize}px "Times New Roman", Georgia, serif`;
-  ctx.fillText(senderRaw, nameX, 516);
-  ctx.restore();
+  ctx.fillText(sender, 188, 491);
 
   ctx.restore();
 }
 
 /**
- * Vẽ chữ khớp chính xác vào các dòng kẻ của MẪU 3 (Lá Thu Tri Ân)
- * Căn chỉnh thông minh vị trí nhãn "Người gửi:" và tên người gửi:
- * - Nếu tên ngắn: "Người gửi:" ở vị trí mặc định 398, tên nằm sát ngay sau nó.
- * - Nếu tên dài: Cả cụm tự động dịch dần sang bên trái để không tụt khỏi lề phải (803px),
- *   đồng thời tên vẫn luôn sát lề với "Người gửi:", không bao giờ bị đè lên nhau.
+ * Vẽ chữ khớp chính xác vào các dòng kẻ chấm của MẪU 3 (Vòm Kem Cô Giáo Áo Vàng)
+ * Đường kẻ solid '_' đã được chuyển hoàn toàn thành dòng chấm '....' đồng nhất.
  */
 function drawTemplate3Content(ctx, data) {
   ctx.save();
 
-  // Phủ nền che các nhãn "Gửi đến:", "Lời chúc:" cũ trên ảnh mẫu
-  ctx.save();
-  ctx.fillStyle = '#F4ECDC';
-  ctx.fillRect(210, 172, 115, 38); // Che "Gửi đến:"
-  ctx.fillRect(210, 224, 115, 38); // Che "Lời chúc:"
-  ctx.restore();
-
-  // Vẽ 2 nhãn đầu với cùng 1 font và 1 size đồng nhất với Mẫu 1 & Mẫu 2
-  ctx.textAlign = 'left';
-  ctx.fillStyle = CARD_LABEL_COLOR;
-  ctx.font = CARD_LABEL_FONT;
-  ctx.fillText('Gửi đến:', 222, 203);
-  ctx.fillText('Lời chúc:', 222, 255);
-
-  // 1. Tên Thầy/Cô (Nằm trên dòng kẻ sau chữ "Gửi đến:")
-  ctx.textAlign = 'left';
+  // 1. Tên Thầy/Cô (Nằm trên dòng chấm sau chữ "Gửi đến:")
   let teacherFontSize = 22;
+  ctx.textAlign = 'left';
   ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
-  ctx.fillStyle = '#1A4329';
+  ctx.fillStyle = '#164329';
   const teacher = data.teacher_name && data.teacher_name.trim() ? data.teacher_name.trim() : 'Thầy/Cô kính mến';
-  while (ctx.measureText(teacher).width > 470 && teacherFontSize > 13) {
+  while (ctx.measureText(teacher).width > 445 && teacherFontSize > 13) {
     teacherFontSize--;
     ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
   }
-  ctx.fillText(teacher, 330, 203);
+  ctx.fillText(teacher, 176, 242);
 
-  // 2. Nội dung lời chúc (Đồng nhất cỡ chữ 22px, bằng hoặc to hơn nhãn)
-  ctx.fillStyle = '#2A2522';
-  ctx.font = CARD_WISH_FONT;
+  // 2. Nội dung lời chúc (Cỡ chữ 22px, dàn đều trên 4 dòng chấm)
+  ctx.fillStyle = '#231C12';
+  let wishFontSize = 22;
+  ctx.font = `italic ${wishFontSize}px "Times New Roman", Georgia, serif`;
 
   const defaultMsg = 'Nhân ngày 20/11, em xin kính chúc Thầy/Cô luôn dồi dào sức khỏe, ngập tràn niềm vui và luôn giữ trọn nhiệt huyết trong từng giờ lên lớp!';
   const rawText = data.message ? data.message.trim() : defaultMsg;
 
-  // Dàn dòng khớp các dòng kẻ
-  const wishLineConfigs = [
-    { startX: 330, maxW: 470, y: 255 }, // Dòng 1 (sau chữ Lời chúc:)
-    { startX: 218, maxW: 585, y: 313 }, // Dòng 2
-    { startX: 218, maxW: 585, y: 362 }, // Dòng 3
-    { startX: 218, maxW: 585, y: 410 }  // Dòng 4
-  ];
+  const dottedY = [329, 367, 405, 443];
+  const maxW = 566;
 
-  const words = rawText.split(/\s+/);
-  const lines = [];
-  let currentLine = '';
-  let lineIdx = 0;
-
-  for (let i = 0; i < words.length; i++) {
-    const word = words[i];
-    const testLine = currentLine ? currentLine + ' ' + word : word;
-    const maxW = wishLineConfigs[lineIdx] ? wishLineConfigs[lineIdx].maxW : 585;
-    const w = ctx.measureText(testLine).width;
-
-    if (w <= maxW) {
-      currentLine = testLine;
-    } else {
-      if (currentLine) lines.push(currentLine);
-      currentLine = word;
-      lineIdx++;
-      if (lineIdx >= wishLineConfigs.length) break;
-    }
-  }
-  if (currentLine && lines.length < wishLineConfigs.length) {
-    lines.push(currentLine);
+  let lines = wrapText(ctx, rawText, maxW);
+  while (lines.length > dottedY.length && wishFontSize > 15) {
+    wishFontSize--;
+    ctx.font = `italic ${wishFontSize}px "Times New Roman", Georgia, serif`;
+    lines = wrapText(ctx, rawText, maxW);
   }
 
-  lines.forEach((line, idx) => {
-    const cfg = wishLineConfigs[idx];
-    if (cfg) {
-      ctx.fillText(line, cfg.startX, cfg.y);
-    }
-  });
+  for (let i = 0; i < Math.min(lines.length, dottedY.length); i++) {
+    ctx.fillText(lines[i], 60, dottedY[i]);
+  }
 
-  // 3. Người gửi
-  // Cơ chế tự động căn lề thông minh theo yêu cầu:
-  // "nếu người gửi điền tên nó sẽ tự động sát lề với cụm từ người gửi còn nếu tên quá dài thì sẽ đẩy dần qua phía bên trái để nó không tụt khỏi lề hoặc bị đè lên chữ người gửi"
-  const RIGHT_BOUND = 803;
-  const DEFAULT_LABEL_X = 398;
-  const MIN_LABEL_X = 218;
-  const labelText = 'Người gửi:';
-
-  const senderRaw = data.is_anonymous
-    ? 'Một sinh viên BTEC FPT'
-    : (data.sender_name && data.sender_name.trim() ? data.sender_name.trim() : 'Học trò BTEC FPT');
-
-  // Đo chiều rộng nhãn và tên người gửi với font chuẩn 22px
-  ctx.font = CARD_LABEL_FONT;
-  const labelW = ctx.measureText(labelText).width;
-  const gap = 8;
-
+  // 3. Người gửi (Nằm trên dòng chấm sau chữ "Người gửi:")
   let senderFontSize = 22;
   ctx.font = `bold ${senderFontSize}px "Times New Roman", Georgia, serif`;
-  let nameW = ctx.measureText(senderRaw).width;
-
-  // Giới hạn an toàn chiều rộng tổng
-  const maxAllowedW = RIGHT_BOUND - MIN_LABEL_X;
-  while ((labelW + gap + nameW) > maxAllowedW && senderFontSize > 13) {
+  ctx.fillStyle = '#164329';
+  const sender = data.is_anonymous
+    ? 'Một sinh viên BTEC FPT'
+    : (data.sender_name && data.sender_name.trim() ? data.sender_name.trim() : 'Học trò BTEC FPT');
+  while (ctx.measureText(sender).width > 240 && senderFontSize > 13) {
     senderFontSize--;
     ctx.font = `bold ${senderFontSize}px "Times New Roman", Georgia, serif`;
-    nameW = ctx.measureText(senderRaw).width;
   }
-
-  const totalW = labelW + gap + nameW;
-  const defaultEndX = DEFAULT_LABEL_X + totalW;
-
-  let labelX;
-  if (defaultEndX <= RIGHT_BOUND) {
-    // Tên ngắn: "Người gửi:" giữ nguyên tại vị trí mặc định 398, tên nằm sát ngay sau nó
-    labelX = DEFAULT_LABEL_X;
-  } else {
-    // Tên dài: Cả cụm dịch dần sang bên trái để điểm kết thúc chạm đúng lề phải (803px),
-    // tên vẫn luôn sát ngay sau nhãn "Người gửi:" nên tuyệt đối không bị đè lên nhau
-    labelX = Math.max(MIN_LABEL_X, RIGHT_BOUND - totalW);
-  }
-  const nameX = labelX + labelW + gap;
-
-  // Phủ màu nền che phần dòng "Người gửi: -----" có sẵn trên ảnh mẫu
-  ctx.save();
-  ctx.fillStyle = '#F4ECDC';
-  ctx.fillRect(MIN_LABEL_X - 10, 438, (RIGHT_BOUND - MIN_LABEL_X) + 20, 36);
-
-  // Vẽ hàng chấm bi (........) ở dưới chân người gửi đồng nhất từ sau "Người gửi:" đến hết lề phải
-  ctx.strokeStyle = '#231C12';
-  ctx.lineWidth = 1.5;
-  ctx.setLineDash([1.5, 4.5]);
-  ctx.beginPath();
-  ctx.moveTo(labelX + labelW + 4, 466);
-  ctx.lineTo(RIGHT_BOUND, 466);
-  ctx.stroke();
-
-  // Vẽ nhãn "Người gửi:" cùng 1 font và 1 size
-  ctx.fillStyle = CARD_LABEL_COLOR;
-  ctx.font = CARD_LABEL_FONT;
-  ctx.textAlign = 'left';
-  ctx.fillText(labelText, labelX, 460);
-
-  // Vẽ tên người gửi (sát ngay sau "Người gửi:")
-  ctx.fillStyle = '#1A4329';
-  ctx.font = `bold ${senderFontSize}px "Times New Roman", Georgia, serif`;
-  ctx.fillText(senderRaw, nameX, 460);
-  ctx.restore();
+  ctx.fillText(sender, 196, 489);
 
   ctx.restore();
 }

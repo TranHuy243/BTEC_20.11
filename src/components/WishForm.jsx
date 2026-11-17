@@ -18,17 +18,17 @@ const TEMPLATE_CARDS = [
   {
     id: 'luxury_cream',
     name: 'Mẫu 1',
-    image: '/frames/frame_mau_1.jpg'
+    image: '/frames/frame_mau_1.jpg?v=5'
   },
   {
     id: 'collegiate_navy',
     name: 'Mẫu 2',
-    image: '/frames/frame_mau_2.jpg'
+    image: '/frames/frame_mau_2.jpg?v=5'
   },
   {
     id: 'slate_chalk',
     name: 'Mẫu 3',
-    image: '/frames/frame_mau_3.jpg'
+    image: '/frames/frame_mau_3.jpg?v=5'
   }
 ];
 
