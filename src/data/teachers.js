@@ -35,7 +35,8 @@ export const TEACHERS_LIST = [
   'Cô Lê Thị Hồng Ngọc',
   'Cô Phạm Thị Thanh Hằng',
   'Thầy Nguyễn Trần Bảo Quân',
-  'Thầy Trần Đức Hùng'
+  'Thầy Trần Đức Hùng',
+  'Cô Trần Băng Huyền'
 ];
 
 /**
