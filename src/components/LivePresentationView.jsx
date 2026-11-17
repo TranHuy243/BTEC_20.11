@@ -204,6 +204,30 @@ export default function LivePresentationView({ wishes = [], onExit }) {
         )}
       </main>
 
+      {/* ===================== FOOTER KHÔI PHỤC ===================== */}
+      <footer className="relative z-30 px-8 md:px-14 py-4 flex items-center justify-end text-xs">
+        <div className="flex items-center gap-2.5">
+          <span className={`font-bold px-3 py-1.5 rounded-xl border shadow-sm ${
+            isSageMint 
+              ? 'bg-white/80 text-emerald-950 border-emerald-200' 
+              : 'bg-white/10 text-white/90 border-white/15'
+          }`}>
+            {wishes.length} lời tri ân
+          </span>
+          <button
+            onClick={toggleFullscreen}
+            className={`p-2 rounded-xl border transition cursor-pointer shadow-sm flex items-center justify-center ${
+              isSageMint
+                ? 'bg-white/80 hover:bg-white text-emerald-900 border-emerald-200'
+                : 'bg-white/10 hover:bg-white/20 text-white/80 hover:text-white border-white/15'
+            }`}
+            title={isFullscreen ? 'Thu nhỏ màn hình (Phím F hoặc Esc)' : 'Phóng to toàn màn hình (Phím F)'}
+          >
+            {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+          </button>
+        </div>
+      </footer>
+
       {/* ===================== MODAL PHÓNG TO CHI TIẾT KHI CHẠM VÀO THIỆP ===================== */}
       {selectedWishForDetail && (
         <div
