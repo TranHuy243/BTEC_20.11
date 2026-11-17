@@ -200,6 +200,18 @@ function wrapText(ctx, text, maxWidth) {
   return lines;
 }
 
+function drawCardDottedLine(ctx, x1, y, x2, color = '#788896') {
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.8;
+  ctx.setLineDash([2, 4]);
+  ctx.beginPath();
+  ctx.moveTo(x1, y);
+  ctx.lineTo(x2, y);
+  ctx.stroke();
+  ctx.restore();
+}
+
 /**
  * Render thiệp lên Canvas
  */
@@ -322,11 +334,11 @@ function drawTemplate1Content(ctx, data) {
   ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
   ctx.fillStyle = '#164329'; // Màu xanh đậm tiệp màu banner tiêu đề
   const teacher = data.teacher_name ? data.teacher_name.trim() : 'Thầy/Cô kính mến';
-  while (ctx.measureText(teacher).width > 460 && teacherFontSize > 13) {
+  while (ctx.measureText(teacher).width > 440 && teacherFontSize > 13) {
     teacherFontSize--;
     ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
   }
-  ctx.fillText(teacher, 176, 200);
+  ctx.fillText(teacher, 175, 200);
 
   // 2. Nội dung lời chúc (Đồng nhất cỡ chữ 22px, dàn đều trên các dòng chấm có sẵn)
   ctx.fillStyle = '#231C12';
@@ -358,11 +370,11 @@ function drawTemplate1Content(ctx, data) {
   const sender = data.is_anonymous 
     ? 'Một sinh viên BTEC FPT' 
     : (data.sender_name && data.sender_name.trim() ? data.sender_name.trim() : 'Học trò BTEC FPT');
-  while (ctx.measureText(sender).width > 340 && senderFontSize > 13) {
+  while (ctx.measureText(sender).width > 360 && senderFontSize > 13) {
     senderFontSize--;
     ctx.font = `bold ${senderFontSize}px "Times New Roman", Georgia, serif`;
   }
-  ctx.fillText(sender, 188, 504);
+  ctx.fillText(sender, 196, 504);
 
   ctx.restore();
 }
@@ -380,11 +392,11 @@ function drawTemplate2Content(ctx, data) {
   ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
   ctx.fillStyle = '#FFFDF0'; // Màu kem ngà sáng nổi bật trên nền xanh đậm
   const teacher = data.teacher_name && data.teacher_name.trim() ? data.teacher_name.trim() : 'Thầy/Cô kính mến';
-  while (ctx.measureText(teacher).width > 400 && teacherFontSize > 13) {
+  while (ctx.measureText(teacher).width > 410 && teacherFontSize > 13) {
     teacherFontSize--;
     ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
   }
-  ctx.fillText(teacher, 176, 246);
+  ctx.fillText(teacher, 180, 246);
 
   // 2. Nội dung lời chúc (Màu kem sáng, dàn trên các dòng chấm)
   ctx.fillStyle = '#FEF7DE';
@@ -430,11 +442,11 @@ function drawTemplate2Content(ctx, data) {
   const sender = data.is_anonymous
     ? 'Một sinh viên BTEC FPT'
     : (data.sender_name && data.sender_name.trim() ? data.sender_name.trim() : 'Học trò BTEC FPT');
-  while (ctx.measureText(sender).width > 325 && senderFontSize > 13) {
+  while (ctx.measureText(sender).width > 390 && senderFontSize > 13) {
     senderFontSize--;
     ctx.font = `bold ${senderFontSize}px "Times New Roman", Georgia, serif`;
   }
-  ctx.fillText(sender, 188, 491);
+  ctx.fillText(sender, 204, 492);
 
   ctx.restore();
 }
@@ -452,11 +464,11 @@ function drawTemplate3Content(ctx, data) {
   ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
   ctx.fillStyle = '#164329';
   const teacher = data.teacher_name && data.teacher_name.trim() ? data.teacher_name.trim() : 'Thầy/Cô kính mến';
-  while (ctx.measureText(teacher).width > 445 && teacherFontSize > 13) {
+  while (ctx.measureText(teacher).width > 440 && teacherFontSize > 13) {
     teacherFontSize--;
     ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
   }
-  ctx.fillText(teacher, 176, 242);
+  ctx.fillText(teacher, 178, 242);
 
   // 2. Nội dung lời chúc (Cỡ chữ 22px, dàn đều trên 4 dòng chấm)
   ctx.fillStyle = '#231C12';
@@ -487,7 +499,7 @@ function drawTemplate3Content(ctx, data) {
   const sender = data.is_anonymous
     ? 'Một sinh viên BTEC FPT'
     : (data.sender_name && data.sender_name.trim() ? data.sender_name.trim() : 'Học trò BTEC FPT');
-  while (ctx.measureText(sender).width > 240 && senderFontSize > 13) {
+  while (ctx.measureText(sender).width > 245 && senderFontSize > 13) {
     senderFontSize--;
     ctx.font = `bold ${senderFontSize}px "Times New Roman", Georgia, serif`;
   }
@@ -498,6 +510,7 @@ function drawTemplate3Content(ctx, data) {
 
 /**
  * Vẽ chữ khớp chính xác vào các dòng kẻ chấm của MẪU 4 (Bưu thiếp Quốc tế - UK & Australia)
+ * Tự động dịch sang trái nếu tên người gửi dài để không đè và không tràn viền.
  */
 function drawTemplate4Content(ctx, data) {
   ctx.save();
@@ -508,11 +521,11 @@ function drawTemplate4Content(ctx, data) {
   ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
   ctx.fillStyle = '#0F2942'; // Xanh navy đậm phong cách bưu chính quốc tế
   const teacher = data.teacher_name ? data.teacher_name.trim() : 'Thầy/Cô kính mến';
-  while (ctx.measureText(teacher).width > 425 && teacherFontSize > 13) {
+  while (ctx.measureText(teacher).width > 400 && teacherFontSize > 13) {
     teacherFontSize--;
     ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
   }
-  ctx.fillText(teacher, 108, 117);
+  ctx.fillText(teacher, 140, 117);
 
   // 2. Nội dung lời chúc (Cỡ chữ 22px, dàn đều trên 4 dòng chấm)
   ctx.fillStyle = '#1E293B';
@@ -536,24 +549,60 @@ function drawTemplate4Content(ctx, data) {
     ctx.fillText(lines[i], 35, dottedY[i]);
   }
 
-  // 3. Người gửi (Nằm trên dòng chấm sau chữ "Người gửi:")
+  // 3. Người gửi: Tự động dịch chuyển sang trái nếu tên dài để không bị đè và không tràn viền
   let senderFontSize = 22;
   ctx.font = `bold ${senderFontSize}px "Times New Roman", Georgia, serif`;
   ctx.fillStyle = '#0F2942';
   const sender = data.is_anonymous 
     ? 'Một sinh viên BTEC FPT' 
     : (data.sender_name && data.sender_name.trim() ? data.sender_name.trim() : 'Học trò BTEC FPT');
-  while (ctx.measureText(sender).width > 190 && senderFontSize > 13) {
-    senderFontSize--;
+
+  const senderW = ctx.measureText(sender).width;
+  const rightBound = 990;
+
+  if (senderW <= 185) {
+    // Tên ngắn vừa vặn với dòng chấm có sẵn bên phải
+    ctx.fillText(sender, 804, 387);
+  } else {
+    // Tên dài: dịch cả cụm "Người gửi:" sang trái để có đủ khoảng trống, không tràn viền
+    ctx.font = CARD_LABEL_FONT;
+    const labelW = ctx.measureText('Người gửi:').width;
+    const totalW = labelW + 12 + senderW;
+    let labelX = rightBound - totalW;
+    if (labelX < 380) {
+      labelX = 380;
+      // Thu nhỏ cỡ chữ người gửi nếu tên cực dài
+      while (ctx.measureText(sender).width > (rightBound - (labelX + labelW + 12)) && senderFontSize > 13) {
+        senderFontSize--;
+        ctx.font = `bold ${senderFontSize}px "Times New Roman", Georgia, serif`;
+      }
+    }
+    const nameX = labelX + labelW + 12;
+
+    // Phủ nền kem che phần Người gửi cũ đã in sẵn
+    ctx.fillStyle = '#FDF3E9';
+    ctx.fillRect(labelX - 8, 366, 1000 - (labelX - 8), 38);
+
+    // Vẽ lại nhãn Người gửi: tại vị trí đã dịch
+    ctx.fillStyle = '#0F2942';
+    ctx.font = CARD_LABEL_FONT;
+    ctx.fillText('Người gửi:', labelX, 387);
+
+    // Vẽ dòng chấm nối tiếp tới mép phải
+    drawCardDottedLine(ctx, nameX - 2, 390, rightBound, '#788896');
+
+    // Vẽ tên người gửi
     ctx.font = `bold ${senderFontSize}px "Times New Roman", Georgia, serif`;
+    ctx.fillStyle = '#0F2942';
+    ctx.fillText(sender, nameX, 387);
   }
-  ctx.fillText(sender, 795, 387);
 
   ctx.restore();
 }
 
 /**
  * Vẽ chữ khớp chính xác vào các dòng kẻ chấm của MẪU 5 (Phong thư Hàng không Quốc tế)
+ * Tự động dịch sang trái nếu tên người gửi dài để không đè và không tràn viền.
  */
 function drawTemplate5Content(ctx, data) {
   ctx.save();
@@ -564,11 +613,11 @@ function drawTemplate5Content(ctx, data) {
   ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
   ctx.fillStyle = '#0F2942';
   const teacher = data.teacher_name ? data.teacher_name.trim() : 'Thầy/Cô kính mến';
-  while (ctx.measureText(teacher).width > 255 && teacherFontSize > 13) {
+  while (ctx.measureText(teacher).width > 260 && teacherFontSize > 13) {
     teacherFontSize--;
     ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
   }
-  ctx.fillText(teacher, 235, 212);
+  ctx.fillText(teacher, 240, 212);
 
   // 2. Nội dung lời chúc (Dàn dòng thông minh: dòng 1 sau chữ "Lời chúc:", các dòng sau từ lề lùi)
   ctx.fillStyle = '#1E293B';
@@ -617,18 +666,52 @@ function drawTemplate5Content(ctx, data) {
     }
   });
 
-  // 3. Người gửi (Nằm trên dòng chấm sau chữ "Người gửi:")
+  // 3. Người gửi: Tự động dịch chuyển sang trái nếu tên dài để không bị đè và không tràn viền
   let senderFontSize = 22;
   ctx.font = `bold ${senderFontSize}px "Times New Roman", Georgia, serif`;
   ctx.fillStyle = '#0F2942';
   const sender = data.is_anonymous 
     ? 'Một sinh viên BTEC FPT' 
     : (data.sender_name && data.sender_name.trim() ? data.sender_name.trim() : 'Học trò BTEC FPT');
-  while (ctx.measureText(sender).width > 155 && senderFontSize > 13) {
-    senderFontSize--;
+
+  const senderW = ctx.measureText(sender).width;
+  const rightBound = 810;
+
+  if (senderW <= 140) {
+    // Tên ngắn vừa vặn với dòng chấm có sẵn bên phải
+    ctx.fillText(sender, 668, 497);
+  } else {
+    // Tên dài: dịch cả cụm "Người gửi:" sang trái để có đủ khoảng trống, không tràn viền
+    ctx.font = CARD_LABEL_FONT;
+    const labelW = ctx.measureText('Người gửi:').width;
+    const totalW = labelW + 12 + senderW;
+    let labelX = rightBound - totalW;
+    if (labelX < 180) {
+      labelX = 180;
+      while (ctx.measureText(sender).width > (rightBound - (labelX + labelW + 12)) && senderFontSize > 13) {
+        senderFontSize--;
+        ctx.font = `bold ${senderFontSize}px "Times New Roman", Georgia, serif`;
+      }
+    }
+    const nameX = labelX + labelW + 12;
+
+    // Phủ nền kem che phần Người gửi cũ đã in sẵn
+    ctx.fillStyle = '#FEF5E3';
+    ctx.fillRect(labelX - 8, 476, 818 - (labelX - 8), 38);
+
+    // Vẽ lại nhãn Người gửi: tại vị trí đã dịch
+    ctx.fillStyle = '#0F2942';
+    ctx.font = CARD_LABEL_FONT;
+    ctx.fillText('Người gửi:', labelX, 497);
+
+    // Vẽ dòng chấm nối tiếp tới mép phải
+    drawCardDottedLine(ctx, nameX - 2, 500, rightBound, '#788896');
+
+    // Vẽ tên người gửi
     ctx.font = `bold ${senderFontSize}px "Times New Roman", Georgia, serif`;
+    ctx.fillStyle = '#0F2942';
+    ctx.fillText(sender, nameX, 497);
   }
-  ctx.fillText(sender, 652, 497);
 
   ctx.restore();
 }
@@ -680,11 +763,11 @@ function drawTemplate6Content(ctx, data) {
   const sender = data.is_anonymous 
     ? 'Một sinh viên BTEC FPT' 
     : (data.sender_name && data.sender_name.trim() ? data.sender_name.trim() : 'Học trò BTEC FPT');
-  while (ctx.measureText(sender).width > 265 && senderFontSize > 13) {
+  while (ctx.measureText(sender).width > 280 && senderFontSize > 13) {
     senderFontSize--;
     ctx.font = `bold ${senderFontSize}px "Times New Roman", Georgia, serif`;
   }
-  ctx.fillText(sender, 200, 538);
+  ctx.fillText(sender, 194, 538);
 
   ctx.restore();
 }
