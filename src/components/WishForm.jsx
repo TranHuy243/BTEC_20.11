@@ -13,7 +13,7 @@ import { searchTeachers } from '../data/teachers';
 import { addWish } from '../lib/supabase';
 import confetti from 'canvas-confetti';
 
-// 3 mẫu bưu thiếp nguyên bản
+// 6 mẫu bưu thiếp nguyên bản
 const TEMPLATE_CARDS = [
   {
     id: 'luxury_cream',
@@ -29,6 +29,21 @@ const TEMPLATE_CARDS = [
     id: 'slate_chalk',
     name: 'Mẫu 3',
     image: '/frames/frame_mau_3.jpg?v=5'
+  },
+  {
+    id: 'international_uk_au',
+    name: 'Mẫu 4',
+    image: '/frames/frame_mau_4.jpg?v=5'
+  },
+  {
+    id: 'airmail_global',
+    name: 'Mẫu 5',
+    image: '/frames/frame_mau_5.jpg?v=5'
+  },
+  {
+    id: 'vintage_journey',
+    name: 'Mẫu 6',
+    image: '/frames/frame_mau_6.jpg?v=5'
   }
 ];
 
@@ -175,8 +190,8 @@ export default function WishForm({ onWishSubmitted, onOpenZoomModal }) {
             </p>
           </div>
 
-          {/* 3 Mẫu thiệp hiển thị hàng ngang trực quan */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 pt-1">
+          {/* 6 Mẫu thiệp hiển thị lưới trực quan */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 pt-1">
             {TEMPLATE_CARDS.map((frame) => {
               const isSelected = selectedFrame === frame.id;
               return (

@@ -40,10 +40,25 @@ export const FRAME_STYLES = [
     id: 'slate_chalk',
     name: 'Mẫu 3',
     desc: 'Thiệp vòm kem cô giáo áo vàng trên nền xanh nhã nhặn'
+  },
+  {
+    id: 'international_uk_au',
+    name: 'Mẫu 4',
+    desc: 'Bưu thiếp Quốc tế - Big Ben & Sydney Opera House'
+  },
+  {
+    id: 'airmail_global',
+    name: 'Mẫu 5',
+    desc: 'Phong thư Hàng không Quốc tế - BTEC & Melbourne'
+  },
+  {
+    id: 'vintage_journey',
+    name: 'Mẫu 6',
+    desc: 'Lưu bút Hội nhập - UK & Melbourne Polytechnic'
   }
 ];
 
-// Cấu hình font chữ và cỡ chữ thống nhất cho nhãn và lời chúc trên cả 3 mẫu thiệp
+// Cấu hình font chữ và cỡ chữ thống nhất cho nhãn và lời chúc trên cả các mẫu thiệp
 export const CARD_LABEL_FONT = 'italic 22px "Times New Roman", Georgia, serif';
 export const CARD_LABEL_COLOR = '#2A2522';
 export const CARD_WISH_FONT = 'italic 22px "Times New Roman", Georgia, serif';
@@ -52,6 +67,9 @@ export const CARD_WISH_FONT = 'italic 22px "Times New Roman", Georgia, serif';
 let cachedFrame1Img = null;
 let cachedFrame2Img = null;
 let cachedFrame3Img = null;
+let cachedFrame4Img = null;
+let cachedFrame5Img = null;
+let cachedFrame6Img = null;
 
 function loadFrame1Image() {
   if (cachedFrame1Img && cachedFrame1Img.complete && cachedFrame1Img.naturalWidth > 0) {
@@ -104,6 +122,60 @@ function loadFrame3Image() {
       resolve(null);
     };
     img.src = '/frames/frame_mau_3.jpg?v=5';
+  });
+}
+
+function loadFrame4Image() {
+  if (cachedFrame4Img && cachedFrame4Img.complete && cachedFrame4Img.naturalWidth > 0) {
+    return Promise.resolve(cachedFrame4Img);
+  }
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      cachedFrame4Img = img;
+      resolve(img);
+    };
+    img.onerror = () => {
+      resolve(null);
+    };
+    img.src = '/frames/frame_mau_4.jpg?v=5';
+  });
+}
+
+function loadFrame5Image() {
+  if (cachedFrame5Img && cachedFrame5Img.complete && cachedFrame5Img.naturalWidth > 0) {
+    return Promise.resolve(cachedFrame5Img);
+  }
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      cachedFrame5Img = img;
+      resolve(img);
+    };
+    img.onerror = () => {
+      resolve(null);
+    };
+    img.src = '/frames/frame_mau_5.jpg?v=5';
+  });
+}
+
+function loadFrame6Image() {
+  if (cachedFrame6Img && cachedFrame6Img.complete && cachedFrame6Img.naturalWidth > 0) {
+    return Promise.resolve(cachedFrame6Img);
+  }
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      cachedFrame6Img = img;
+      resolve(img);
+    };
+    img.onerror = () => {
+      resolve(null);
+    };
+    img.src = '/frames/frame_mau_6.jpg?v=5';
   });
 }
 
@@ -189,6 +261,45 @@ export async function renderCardOnCanvas(canvas, data) {
     }
     // Điền chữ khớp vào các dòng kẻ và tự động căn chỉnh lề người gửi
     drawTemplate3Content(ctx, data);
+    return;
+  }
+
+  // 5. MẪU 4: Bưu thiếp Quốc tế (UK & Australia)
+  if (styleId === 'international_uk_au') {
+    const bgImg = await loadFrame4Image();
+    if (bgImg) {
+      ctx.drawImage(bgImg, 0, 0, CARD_WIDTH, CARD_HEIGHT);
+    } else {
+      ctx.fillStyle = '#FFFDF7';
+      ctx.fillRect(0, 0, CARD_WIDTH, CARD_HEIGHT);
+    }
+    drawTemplate4Content(ctx, data);
+    return;
+  }
+
+  // 6. MẪU 5: Phong thư Hàng không Quốc tế (BTEC & Melbourne)
+  if (styleId === 'airmail_global') {
+    const bgImg = await loadFrame5Image();
+    if (bgImg) {
+      ctx.drawImage(bgImg, 0, 0, CARD_WIDTH, CARD_HEIGHT);
+    } else {
+      ctx.fillStyle = '#FFFDF7';
+      ctx.fillRect(0, 0, CARD_WIDTH, CARD_HEIGHT);
+    }
+    drawTemplate5Content(ctx, data);
+    return;
+  }
+
+  // 7. MẪU 6: Lưu bút Hội nhập (UK & Melbourne Polytechnic)
+  if (styleId === 'vintage_journey') {
+    const bgImg = await loadFrame6Image();
+    if (bgImg) {
+      ctx.drawImage(bgImg, 0, 0, CARD_WIDTH, CARD_HEIGHT);
+    } else {
+      ctx.fillStyle = '#FFFDF7';
+      ctx.fillRect(0, 0, CARD_WIDTH, CARD_HEIGHT);
+    }
+    drawTemplate6Content(ctx, data);
     return;
   }
 
@@ -381,6 +492,199 @@ function drawTemplate3Content(ctx, data) {
     ctx.font = `bold ${senderFontSize}px "Times New Roman", Georgia, serif`;
   }
   ctx.fillText(sender, 196, 489);
+
+  ctx.restore();
+}
+
+/**
+ * Vẽ chữ khớp chính xác vào các dòng kẻ chấm của MẪU 4 (Bưu thiếp Quốc tế - UK & Australia)
+ */
+function drawTemplate4Content(ctx, data) {
+  ctx.save();
+
+  // 1. Tên Thầy/Cô (Nằm trên dòng chấm sau chữ "Gửi đến:")
+  let teacherFontSize = 22;
+  ctx.textAlign = 'left';
+  ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
+  ctx.fillStyle = '#0F2942'; // Xanh navy đậm phong cách bưu chính quốc tế
+  const teacher = data.teacher_name ? data.teacher_name.trim() : 'Thầy/Cô kính mến';
+  while (ctx.measureText(teacher).width > 425 && teacherFontSize > 13) {
+    teacherFontSize--;
+    ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
+  }
+  ctx.fillText(teacher, 108, 117);
+
+  // 2. Nội dung lời chúc (Cỡ chữ 22px, dàn đều trên 4 dòng chấm)
+  ctx.fillStyle = '#1E293B';
+  let wishFontSize = 22;
+  ctx.font = `italic ${wishFontSize}px "Times New Roman", Georgia, serif`;
+
+  const defaultMsg = 'Nhân ngày 20/11, em xin kính chúc Thầy/Cô luôn dồi dào sức khỏe, ngập tràn niềm vui và luôn giữ trọn nhiệt huyết trong từng giờ lên lớp!';
+  const rawText = data.message ? data.message.trim() : defaultMsg;
+
+  const dottedY = [201, 239, 277, 315];
+  const maxW = 595;
+
+  let lines = wrapText(ctx, rawText, maxW);
+  while (lines.length > dottedY.length && wishFontSize > 15) {
+    wishFontSize--;
+    ctx.font = `italic ${wishFontSize}px "Times New Roman", Georgia, serif`;
+    lines = wrapText(ctx, rawText, maxW);
+  }
+
+  for (let i = 0; i < Math.min(lines.length, dottedY.length); i++) {
+    ctx.fillText(lines[i], 35, dottedY[i]);
+  }
+
+  // 3. Người gửi (Nằm trên dòng chấm sau chữ "Người gửi:")
+  let senderFontSize = 22;
+  ctx.font = `bold ${senderFontSize}px "Times New Roman", Georgia, serif`;
+  ctx.fillStyle = '#0F2942';
+  const sender = data.is_anonymous 
+    ? 'Một sinh viên BTEC FPT' 
+    : (data.sender_name && data.sender_name.trim() ? data.sender_name.trim() : 'Học trò BTEC FPT');
+  while (ctx.measureText(sender).width > 190 && senderFontSize > 13) {
+    senderFontSize--;
+    ctx.font = `bold ${senderFontSize}px "Times New Roman", Georgia, serif`;
+  }
+  ctx.fillText(sender, 795, 387);
+
+  ctx.restore();
+}
+
+/**
+ * Vẽ chữ khớp chính xác vào các dòng kẻ chấm của MẪU 5 (Phong thư Hàng không Quốc tế)
+ */
+function drawTemplate5Content(ctx, data) {
+  ctx.save();
+
+  // 1. Tên Thầy/Cô (Nằm trên dòng chấm sau chữ "Gửi đến:")
+  let teacherFontSize = 22;
+  ctx.textAlign = 'left';
+  ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
+  ctx.fillStyle = '#0F2942';
+  const teacher = data.teacher_name ? data.teacher_name.trim() : 'Thầy/Cô kính mến';
+  while (ctx.measureText(teacher).width > 255 && teacherFontSize > 13) {
+    teacherFontSize--;
+    ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
+  }
+  ctx.fillText(teacher, 235, 212);
+
+  // 2. Nội dung lời chúc (Dàn dòng thông minh: dòng 1 sau chữ "Lời chúc:", các dòng sau từ lề lùi)
+  ctx.fillStyle = '#1E293B';
+  let wishFontSize = 22;
+  ctx.font = `italic ${wishFontSize}px "Times New Roman", Georgia, serif`;
+
+  const defaultMsg = 'Nhân ngày 20/11, em xin kính chúc Thầy/Cô luôn dồi dào sức khỏe, ngập tràn niềm vui và luôn giữ trọn nhiệt huyết trong từng giờ lên lớp!';
+  const rawText = data.message ? data.message.trim() : defaultMsg;
+
+  const wishConfigs = [
+    { startX: 235, maxW: 635, y: 261 }, // Dòng 1 (sau chữ Lời chúc:)
+    { startX: 139, maxW: 730, y: 303 }, // Dòng 2
+    { startX: 139, maxW: 730, y: 345 }, // Dòng 3
+    { startX: 139, maxW: 730, y: 390 }, // Dòng 4
+    { startX: 139, maxW: 730, y: 433 }  // Dòng 5
+  ];
+
+  const words = rawText.split(/\s+/);
+  const lines = [];
+  let currentLine = '';
+  let lineIdx = 0;
+
+  for (let i = 0; i < words.length; i++) {
+    const word = words[i];
+    const testLine = currentLine ? currentLine + ' ' + word : word;
+    const maxW = wishConfigs[lineIdx] ? wishConfigs[lineIdx].maxW : 730;
+    const w = ctx.measureText(testLine).width;
+
+    if (w <= maxW) {
+      currentLine = testLine;
+    } else {
+      if (currentLine) lines.push(currentLine);
+      currentLine = word;
+      lineIdx++;
+      if (lineIdx >= wishConfigs.length) break;
+    }
+  }
+  if (currentLine && lines.length < wishConfigs.length) {
+    lines.push(currentLine);
+  }
+
+  lines.forEach((line, idx) => {
+    const cfg = wishConfigs[idx];
+    if (cfg) {
+      ctx.fillText(line, cfg.startX, cfg.y);
+    }
+  });
+
+  // 3. Người gửi (Nằm trên dòng chấm sau chữ "Người gửi:")
+  let senderFontSize = 22;
+  ctx.font = `bold ${senderFontSize}px "Times New Roman", Georgia, serif`;
+  ctx.fillStyle = '#0F2942';
+  const sender = data.is_anonymous 
+    ? 'Một sinh viên BTEC FPT' 
+    : (data.sender_name && data.sender_name.trim() ? data.sender_name.trim() : 'Học trò BTEC FPT');
+  while (ctx.measureText(sender).width > 155 && senderFontSize > 13) {
+    senderFontSize--;
+    ctx.font = `bold ${senderFontSize}px "Times New Roman", Georgia, serif`;
+  }
+  ctx.fillText(sender, 652, 497);
+
+  ctx.restore();
+}
+
+/**
+ * Vẽ chữ khớp chính xác vào các dòng kẻ chấm của MẪU 6 (Lưu bút Hội nhập - UK & Melbourne)
+ */
+function drawTemplate6Content(ctx, data) {
+  ctx.save();
+
+  // 1. Tên Thầy/Cô (Nằm trên dòng chấm sau chữ "Gửi đến:")
+  let teacherFontSize = 22;
+  ctx.textAlign = 'left';
+  ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
+  ctx.fillStyle = '#0F2942';
+  const teacher = data.teacher_name ? data.teacher_name.trim() : 'Thầy/Cô kính mến';
+  while (ctx.measureText(teacher).width > 460 && teacherFontSize > 13) {
+    teacherFontSize--;
+    ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
+  }
+  ctx.fillText(teacher, 170, 165);
+
+  // 2. Nội dung lời chúc (Cỡ chữ 22px, dàn đều trên 5 dòng chấm)
+  ctx.fillStyle = '#1E293B';
+  let wishFontSize = 22;
+  ctx.font = `italic ${wishFontSize}px "Times New Roman", Georgia, serif`;
+
+  const defaultMsg = 'Nhân ngày 20/11, em xin kính chúc Thầy/Cô luôn dồi dào sức khỏe, ngập tràn niềm vui và luôn giữ trọn nhiệt huyết trong từng giờ lên lớp!';
+  const rawText = data.message ? data.message.trim() : defaultMsg;
+
+  const dottedY = [261, 303, 345, 389, 433];
+  const maxW = 595;
+
+  let lines = wrapText(ctx, rawText, maxW);
+  while (lines.length > dottedY.length && wishFontSize > 15) {
+    wishFontSize--;
+    ctx.font = `italic ${wishFontSize}px "Times New Roman", Georgia, serif`;
+    lines = wrapText(ctx, rawText, maxW);
+  }
+
+  for (let i = 0; i < Math.min(lines.length, dottedY.length); i++) {
+    ctx.fillText(lines[i], 35, dottedY[i]);
+  }
+
+  // 3. Người gửi (Nằm trên dòng chấm sau chữ "Người gửi:")
+  let senderFontSize = 22;
+  ctx.font = `bold ${senderFontSize}px "Times New Roman", Georgia, serif`;
+  ctx.fillStyle = '#0F2942';
+  const sender = data.is_anonymous 
+    ? 'Một sinh viên BTEC FPT' 
+    : (data.sender_name && data.sender_name.trim() ? data.sender_name.trim() : 'Học trò BTEC FPT');
+  while (ctx.measureText(sender).width > 265 && senderFontSize > 13) {
+    senderFontSize--;
+    ctx.font = `bold ${senderFontSize}px "Times New Roman", Georgia, serif`;
+  }
+  ctx.fillText(sender, 200, 538);
 
   ctx.restore();
 }
