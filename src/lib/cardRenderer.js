@@ -59,9 +59,9 @@ export const FRAME_STYLES = [
 ];
 
 // Cấu hình font chữ và cỡ chữ thống nhất cho nhãn và lời chúc trên cả các mẫu thiệp
-export const CARD_LABEL_FONT = 'italic 22px "Times New Roman", Georgia, serif';
+export const CARD_LABEL_FONT = 'italic 26px "Times New Roman", Georgia, serif';
 export const CARD_LABEL_COLOR = '#2A2522';
-export const CARD_WISH_FONT = 'italic 22px "Times New Roman", Georgia, serif';
+export const CARD_WISH_FONT = 'italic 26px "Times New Roman", Georgia, serif';
 
 // Caching ảnh khung thiệp
 let cachedFrame1Img = null;
@@ -344,7 +344,7 @@ function drawTemplate1Content(ctx, data) {
   ctx.save();
 
   // 1. Tên Thầy/Cô (Nằm trên dòng chấm sau chữ "Gửi đến:")
-  let teacherFontSize = 22;
+  let teacherFontSize = 26;
   ctx.textAlign = 'left';
   ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
   ctx.fillStyle = '#164329'; // Màu xanh đậm tiệp màu banner tiêu đề
@@ -355,9 +355,9 @@ function drawTemplate1Content(ctx, data) {
   }
   ctx.fillText(teacher, 175, 200);
 
-  // 2. Nội dung lời chúc (Đồng nhất cỡ chữ 22px, dàn đều trên các dòng chấm có sẵn)
-  ctx.fillStyle = '#231C12';
-  let wishFontSize = 22;
+  // 2. Nội dung lời chúc (Đồng nhất cỡ chữ 26px, cùng màu xanh đậm #164329 với người gửi & gửi đến)
+  ctx.fillStyle = '#164329';
+  let wishFontSize = 26;
   ctx.font = `italic ${wishFontSize}px "Times New Roman", Georgia, serif`;
 
   const defaultMsg = 'Nhân ngày 20/11, em xin kính chúc Thầy/Cô luôn dồi dào sức khỏe, ngập tràn niềm vui và luôn giữ trọn nhiệt huyết trong từng giờ lên lớp!';
@@ -379,7 +379,7 @@ function drawTemplate1Content(ctx, data) {
   }
 
   // 3. Người gửi (Nằm trên dòng chấm sau chữ "Người gửi:")
-  let senderFontSize = 22;
+  let senderFontSize = 26;
   ctx.font = `bold ${senderFontSize}px "Times New Roman", Georgia, serif`;
   ctx.fillStyle = '#164329';
   const sender = data.is_anonymous 
@@ -402,7 +402,7 @@ function drawTemplate2Content(ctx, data) {
   ctx.save();
 
   // 1. Tên Thầy/Cô (Nằm trên dòng chấm sau chữ "Gửi đến:")
-  let teacherFontSize = 22;
+  let teacherFontSize = 26;
   ctx.textAlign = 'left';
   ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
   ctx.fillStyle = '#FFFDF0'; // Màu kem ngà sáng nổi bật trên nền xanh đậm
@@ -413,9 +413,9 @@ function drawTemplate2Content(ctx, data) {
   }
   ctx.fillText(teacher, 180, 246);
 
-  // 2. Nội dung lời chúc (Màu kem sáng, dàn trên các dòng chấm)
-  ctx.fillStyle = '#FEF7DE';
-  let wishFontSize = 22;
+  // 2. Nội dung lời chúc (Đồng nhất cỡ chữ 26px, cùng màu kem sáng #FFFDF0)
+  ctx.fillStyle = '#FFFDF0';
+  let wishFontSize = 26;
   ctx.font = `italic ${wishFontSize}px "Times New Roman", Georgia, serif`;
 
   const defaultMsg = 'Nhân ngày 20/11, em xin kính chúc Thầy/Cô luôn dồi dào sức khỏe, ngập tràn niềm vui và luôn giữ trọn nhiệt huyết trong từng giờ lên lớp!';
@@ -451,7 +451,7 @@ function drawTemplate2Content(ctx, data) {
   }
 
   // 3. Người gửi (Nằm trên dòng chấm sau chữ "Người gửi:")
-  let senderFontSize = 22;
+  let senderFontSize = 26;
   ctx.font = `bold ${senderFontSize}px "Times New Roman", Georgia, serif`;
   ctx.fillStyle = '#FFFDF0';
   const sender = data.is_anonymous
@@ -474,7 +474,7 @@ function drawTemplate3Content(ctx, data) {
   ctx.save();
 
   // 1. Tên Thầy/Cô (Nằm trên dòng chấm sau chữ "Gửi đến:")
-  let teacherFontSize = 22;
+  let teacherFontSize = 26;
   ctx.textAlign = 'left';
   ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
   ctx.fillStyle = '#164329';
@@ -485,9 +485,9 @@ function drawTemplate3Content(ctx, data) {
   }
   ctx.fillText(teacher, 178, 242);
 
-  // 2. Nội dung lời chúc (Cỡ chữ 22px, dàn đều trên 4 dòng chấm)
-  ctx.fillStyle = '#231C12';
-  let wishFontSize = 22;
+  // 2. Nội dung lời chúc (Đồng nhất cỡ chữ 26px, cùng màu xanh đậm #164329 với người gửi & gửi đến)
+  ctx.fillStyle = '#164329';
+  let wishFontSize = 26;
   ctx.font = `italic ${wishFontSize}px "Times New Roman", Georgia, serif`;
 
   const defaultMsg = 'Nhân ngày 20/11, em xin kính chúc Thầy/Cô luôn dồi dào sức khỏe, ngập tràn niềm vui và luôn giữ trọn nhiệt huyết trong từng giờ lên lớp!';
@@ -508,7 +508,7 @@ function drawTemplate3Content(ctx, data) {
   }
 
   // 3. Người gửi (Nằm trên dòng chấm sau chữ "Người gửi:")
-  let senderFontSize = 22;
+  let senderFontSize = 26;
   ctx.font = `bold ${senderFontSize}px "Times New Roman", Georgia, serif`;
   ctx.fillStyle = '#164329';
   const sender = data.is_anonymous
@@ -531,7 +531,7 @@ function drawTemplate4Content(ctx, data) {
   ctx.save();
 
   // 1. Tên Thầy/Cô (Nằm trên dòng chấm sau chữ "Gửi đến:")
-  let teacherFontSize = 22;
+  let teacherFontSize = 26;
   ctx.textAlign = 'left';
   ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
   ctx.fillStyle = '#0F2942'; // Xanh navy đậm phong cách bưu chính quốc tế
@@ -542,9 +542,9 @@ function drawTemplate4Content(ctx, data) {
   }
   ctx.fillText(teacher, 140, 117);
 
-  // 2. Nội dung lời chúc (Cỡ chữ 22px, dàn đều trên 4 dòng chấm)
-  ctx.fillStyle = '#1E293B';
-  let wishFontSize = 22;
+  // 2. Nội dung lời chúc (Đồng nhất cỡ chữ 26px, cùng màu xanh navy #0F2942 với người gửi & gửi đến)
+  ctx.fillStyle = '#0F2942';
+  let wishFontSize = 26;
   ctx.font = `italic ${wishFontSize}px "Times New Roman", Georgia, serif`;
 
   const defaultMsg = 'Nhân ngày 20/11, em xin kính chúc Thầy/Cô luôn dồi dào sức khỏe, ngập tràn niềm vui và luôn giữ trọn nhiệt huyết trong từng giờ lên lớp!';
@@ -565,7 +565,7 @@ function drawTemplate4Content(ctx, data) {
   }
 
   // 3. Người gửi: Tự động dịch chuyển sang trái nếu tên dài để không bị đè và không tràn viền
-  let senderFontSize = 22;
+  let senderFontSize = 26;
   ctx.font = `bold ${senderFontSize}px "Times New Roman", Georgia, serif`;
   ctx.fillStyle = '#0F2942';
   const sender = data.is_anonymous 
@@ -623,7 +623,7 @@ function drawTemplate5Content(ctx, data) {
   ctx.save();
 
   // 1. Tên Thầy/Cô (Nằm trên dòng chấm sau chữ "Gửi đến:")
-  let teacherFontSize = 22;
+  let teacherFontSize = 26;
   ctx.textAlign = 'left';
   ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
   ctx.fillStyle = '#0F2942';
@@ -634,9 +634,9 @@ function drawTemplate5Content(ctx, data) {
   }
   ctx.fillText(teacher, 240, 212);
 
-  // 2. Nội dung lời chúc (Dàn dòng thông minh: dòng 1 sau chữ "Lời chúc:", các dòng sau từ lề lùi)
-  ctx.fillStyle = '#1E293B';
-  let wishFontSize = 22;
+  // 2. Nội dung lời chúc (Đồng nhất cỡ chữ 26px, cùng màu xanh navy #0F2942 với người gửi & gửi đến)
+  ctx.fillStyle = '#0F2942';
+  let wishFontSize = 26;
   ctx.font = `italic ${wishFontSize}px "Times New Roman", Georgia, serif`;
 
   const defaultMsg = 'Nhân ngày 20/11, em xin kính chúc Thầy/Cô luôn dồi dào sức khỏe, ngập tràn niềm vui và luôn giữ trọn nhiệt huyết trong từng giờ lên lớp!';
@@ -682,7 +682,7 @@ function drawTemplate5Content(ctx, data) {
   });
 
   // 3. Người gửi: Tự động dịch chuyển sang trái nếu tên dài để không bị đè và không tràn viền
-  let senderFontSize = 22;
+  let senderFontSize = 26;
   ctx.font = `bold ${senderFontSize}px "Times New Roman", Georgia, serif`;
   ctx.fillStyle = '#0F2942';
   const sender = data.is_anonymous 
@@ -738,7 +738,7 @@ function drawTemplate6Content(ctx, data) {
   ctx.save();
 
   // 1. Tên Thầy/Cô (Nằm trên dòng chấm sau chữ "Gửi đến:")
-  let teacherFontSize = 22;
+  let teacherFontSize = 26;
   ctx.textAlign = 'left';
   ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
   ctx.fillStyle = '#0F2942';
@@ -749,9 +749,9 @@ function drawTemplate6Content(ctx, data) {
   }
   ctx.fillText(teacher, 170, 165);
 
-  // 2. Nội dung lời chúc (Cỡ chữ 22px, dàn đều trên 5 dòng chấm)
-  ctx.fillStyle = '#1E293B';
-  let wishFontSize = 22;
+  // 2. Nội dung lời chúc (Đồng nhất cỡ chữ 26px, cùng màu xanh navy #0F2942 với người gửi & gửi đến)
+  ctx.fillStyle = '#0F2942';
+  let wishFontSize = 26;
   ctx.font = `italic ${wishFontSize}px "Times New Roman", Georgia, serif`;
 
   const defaultMsg = 'Nhân ngày 20/11, em xin kính chúc Thầy/Cô luôn dồi dào sức khỏe, ngập tràn niềm vui và luôn giữ trọn nhiệt huyết trong từng giờ lên lớp!';
@@ -772,7 +772,7 @@ function drawTemplate6Content(ctx, data) {
   }
 
   // 3. Người gửi (Nằm trên dòng chấm sau chữ "Người gửi:")
-  let senderFontSize = 22;
+  let senderFontSize = 26;
   ctx.font = `bold ${senderFontSize}px "Times New Roman", Georgia, serif`;
   ctx.fillStyle = '#0F2942';
   const sender = data.is_anonymous 
