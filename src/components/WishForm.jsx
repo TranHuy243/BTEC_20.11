@@ -1,19 +1,45 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { 
-  Send, Download, Maximize2, AlertTriangle, 
-  Check, Sparkles, User, GraduationCap, 
-  Palette, ShieldCheck 
+  Send, ArrowDown, ArrowUpRight, AlertTriangle, 
+  PenTool 
 } from 'lucide-react';
-import { checkProfanity, countWords } from '../lib/profanityFilter';
+import { checkProfanity } from '../lib/profanityFilter';
 import { 
   WISH_TOPICS, 
-  FRAME_STYLES, 
   renderCardOnCanvas, 
   downloadCardImage 
 } from '../lib/cardRenderer';
 import { searchTeachers } from '../data/teachers';
 import { addWish } from '../lib/supabase';
 import confetti from 'canvas-confetti';
+
+// 3 mẫu bưu thiếp nguyên bản với hình ảnh minh họa và mô tả khớp theo ảnh mẫu
+const TEMPLATE_CARDS = [
+  {
+    id: 'luxury_cream',
+    stepNumber: '01',
+    title: '01 · Nắng tháng Mười Một',
+    name: 'Mẫu 1',
+    tag: 'Ấm áp, hoa lá',
+    image: '/frames/frame_mau_1.jpg'
+  },
+  {
+    id: 'collegiate_navy',
+    stepNumber: '02',
+    title: '02 · Thanh xuân BTEC',
+    name: 'Mẫu 2',
+    tag: 'Trẻ trung, tươi sáng',
+    image: '/frames/frame_mau_2.jpg'
+  },
+  {
+    id: 'slate_chalk',
+    stepNumber: '03',
+    title: '03 · Điều muốn nói',
+    name: 'Mẫu 3',
+    tag: 'Nhẹ nhàng, tinh tế',
+    image: '/frames/frame_mau_3.jpg'
+  }
+];
 
 export default function WishForm({ onWishSubmitted, onOpenZoomModal }) {
   const [teacherName, setTeacherName] = useState('');
@@ -46,9 +72,7 @@ export default function WishForm({ onWishSubmitted, onOpenZoomModal }) {
     if (!teacherName || !teacherName.trim()) {
       return [];
     }
-    // Lọc các tên trùng khớp
     const matches = searchTeachers(teacherName);
-    // Nếu tên đã gõ khớp hoàn toàn với một gợi ý duy nhất thì không cần hiện nữa
     if (matches.length === 1 && matches[0].toLowerCase() === teacherName.trim().toLowerCase()) {
       return [];
     }
@@ -139,21 +163,104 @@ export default function WishForm({ onWishSubmitted, onOpenZoomModal }) {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 md:px-8 py-6">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        
-        {/* ===================== CỘT TRÁI: FORM SOẠN THIỆP (5/12) ===================== */}
-        <div className="lg:col-span-5 bg-white rounded-3xl p-6 md:p-7 border border-slate-200/90 shadow-xl shadow-slate-900/5">
-          
-          <form onSubmit={handleSubmit} className="space-y-5">
-            
-            {/* 1. Gửi đến Thầy/Cô (Gợi ý đơn giản, chỉ hiện khi gõ chữ) */}
-            <div ref={teacherDropdownRef} className="relative">
-              <label className="block text-xs md:text-sm font-bold text-slate-800 mb-1.5 flex items-center gap-1.5">
-                <GraduationCap className="w-4 h-4 text-rose-600" />
-                <span>Gửi đến Thầy/Cô <span className="text-rose-600">*</span></span>
-              </label>
+    <div className="max-w-5xl mx-auto px-4 md:px-8 py-6 space-y-12">
+      <form onSubmit={handleSubmit} className="space-y-12">
 
+        {/* ========================================================================= */}
+        {/* PHẦN 1: BẮT ĐẦU VÔ CHỌN THIỆP (GIỮ NGUYÊN 3 LOẠI THIỆP)                   */}
+        {/* ========================================================================= */}
+        <section className="space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
+            <div>
+              <p className="text-xs font-bold text-orange-600 tracking-wider uppercase mb-1">
+                01 — CÂU CHUYỆN BẮT ĐẦU
+              </p>
+              <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">
+                Chọn tấm thiệp bạn thích
+              </h2>
+              <p className="text-xs md:text-sm text-slate-500 mt-1">
+                Ba phong cách khác nhau, cùng dành cho một lời cảm ơn.
+              </p>
+            </div>
+            <p className="text-xs text-slate-400 font-medium self-start sm:self-auto">
+              Chọn một mẫu để tiếp tục ↓
+            </p>
+          </div>
+
+          {/* 3 Mẫu thiệp hiển thị hàng ngang trực quan */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 pt-1">
+            {TEMPLATE_CARDS.map((frame) => {
+              const isSelected = selectedFrame === frame.id;
+              return (
+                <div
+                  key={frame.id}
+                  onClick={() => setSelectedFrame(frame.id)}
+                  className={`group relative rounded-3xl overflow-hidden bg-white border-2 transition-all duration-200 cursor-pointer ${
+                    isSelected
+                      ? 'border-orange-500 shadow-xl ring-4 ring-orange-100 scale-[1.01]'
+                      : 'border-slate-200 hover:border-slate-300 hover:shadow-md'
+                  }`}
+                >
+                  {/* Ảnh thu nhỏ của mẫu thiệp */}
+                  <div className="relative w-full aspect-[16/10] overflow-hidden bg-[#FAF7F2]">
+                    <img
+                      src={frame.image}
+                      alt={frame.name}
+                      className="w-full h-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
+                    />
+                    {/* Dấu tích cam khi được chọn */}
+                    {isSelected && (
+                      <div className="absolute top-3 right-3 w-7 h-7 rounded-full bg-orange-500 text-white flex items-center justify-center shadow-md font-bold text-xs">
+                        ✓
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Thanh thông tin dưới chân tấm thiệp */}
+                  <div className="p-4 flex items-center justify-between text-xs bg-white border-t border-slate-100">
+                    <span className={`font-bold ${isSelected ? 'text-orange-950' : 'text-slate-800'}`}>
+                      {frame.title}
+                    </span>
+                    <span className="text-slate-400 font-medium">
+                      {frame.tag}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+
+        {/* ========================================================================= */}
+        {/* PHẦN 2: PHẦN GHI THIỆP THEO BỐ CỤC ẢNH 3                                  */}
+        {/* ========================================================================= */}
+        <section className="bg-white rounded-3xl p-6 md:p-8 border border-slate-200/90 shadow-sm space-y-6">
+          
+          {/* Header phần ghi thiệp */}
+          <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+            <div>
+              <h3 className="text-lg md:text-xl font-bold text-slate-900 flex items-center gap-2">
+                <span>💌</span>
+                <span>Gửi đến thầy cô</span>
+              </h3>
+              <p className="text-xs md:text-sm text-slate-500 mt-1">
+                Chỉ mất vài phút để tạo nên một lời chúc thật riêng.
+              </p>
+            </div>
+            <div className="w-9 h-9 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center border border-orange-100">
+              <PenTool className="w-4 h-4" />
+            </div>
+          </div>
+
+          {/* Hàng 1: Hai cột Tên thầy/cô & Tên người gửi */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            
+            {/* Cột 1: Tên thầy/cô nhận thiệp */}
+            <div ref={teacherDropdownRef} className="relative">
+              <label className="block text-xs md:text-sm font-bold text-slate-800 mb-2">
+                Tên thầy/cô nhận thiệp <span className="text-rose-500">*</span>
+              </label>
               <input
                 type="text"
                 value={teacherName}
@@ -166,12 +273,12 @@ export default function WishForm({ onWishSubmitted, onOpenZoomModal }) {
                     setIsTeacherDropdownOpen(true);
                   }
                 }}
-                placeholder="Nhập tên thầy cô"
-                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 placeholder-slate-400 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition"
+                placeholder="Ví dụ: Cô Nguyễn Thị..."
+                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 placeholder-slate-400 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition"
                 required
               />
 
-              {/* Danh sách tên trùng khớp đơn giản (chỉ hiện khi gõ) */}
+              {/* Danh sách tên gợi ý */}
               {isTeacherDropdownOpen && suggestedTeachers.length > 0 && (
                 <div className="absolute z-30 left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden max-h-52 overflow-y-auto">
                   {suggestedTeachers.map((teacher, index) => (
@@ -181,7 +288,7 @@ export default function WishForm({ onWishSubmitted, onOpenZoomModal }) {
                         setTeacherName(teacher);
                         setIsTeacherDropdownOpen(false);
                       }}
-                      className="px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 hover:text-rose-700 cursor-pointer transition border-b border-slate-50 last:border-none"
+                      className="px-4 py-2.5 text-sm text-slate-700 hover:bg-orange-50 hover:text-orange-700 cursor-pointer transition border-b border-slate-50 last:border-none"
                     >
                       {teacher}
                     </div>
@@ -190,17 +297,11 @@ export default function WishForm({ onWishSubmitted, onOpenZoomModal }) {
               )}
             </div>
 
-            {/* 2. Người gửi: Điền tên & Nút chọn Gửi ẩn danh */}
-            <div className="bg-slate-50/70 p-4 rounded-2xl border border-slate-200/70 space-y-3">
-              <div className="flex items-center justify-between">
-                <label className="text-xs md:text-sm font-bold text-slate-800 flex items-center gap-1.5">
-                  <User className="w-4 h-4 text-rose-600" />
-                  <span>Người gửi</span>
-                  {!isAnonymous ? (
-                    <span className="text-rose-600 font-bold">*</span>
-                  ) : (
-                    <span className="text-slate-400 text-xs font-normal italic">(Ẩn danh)</span>
-                  )}
+            {/* Cột 2: Tên của bạn */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-xs md:text-sm font-bold text-slate-800">
+                  Tên của bạn {!isAnonymous && <span className="text-rose-500">*</span>}
                 </label>
                 <span className="text-[11px] text-slate-400">Tối đa 60 ký tự</span>
               </div>
@@ -211,220 +312,216 @@ export default function WishForm({ onWishSubmitted, onOpenZoomModal }) {
                 value={senderName}
                 onChange={(e) => setSenderName(e.target.value)}
                 disabled={isAnonymous}
-                placeholder={isAnonymous ? 'BTEC-er' : 'Nhập tên người gửi'}
+                placeholder={isAnonymous ? 'BTEC-er (Ẩn danh)' : 'Ví dụ: Nguyễn Văn A'}
                 className={`w-full px-4 py-2.5 rounded-xl border text-sm transition focus:outline-none ${
                   isAnonymous
                     ? 'bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed italic'
-                    : 'bg-white border-slate-200 text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500'
+                    : 'bg-white border-slate-200 text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500'
                 }`}
               />
 
-              {/* Nút chọn Gửi ẩn danh dạng Pill (bấm vào chữ đổi màu, không cần dấu tích V) */}
-              <div className="flex items-center justify-end pt-1">
+              <div className="flex items-center justify-between mt-2 text-xs">
+                <span className="text-[11px] text-slate-400">
+                  Người gửi được hiển thị trên thiệp
+                </span>
+                <label className="inline-flex items-center gap-1.5 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={isAnonymous}
+                    onChange={(e) => {
+                      const next = e.target.checked;
+                      setIsAnonymous(next);
+                      if (next) setSenderName('');
+                    }}
+                    className="w-4 h-4 rounded text-orange-600 focus:ring-orange-500 border-slate-300 cursor-pointer"
+                  />
+                  <span className="text-xs font-semibold text-slate-700">Gửi ẩn danh</span>
+                </label>
+              </div>
+            </div>
+
+          </div>
+
+          {/* Hàng 2: Văn mẫu điền nhanh */}
+          <div className="p-3.5 md:p-4 rounded-2xl bg-[#FFF8F3] border border-orange-200/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <span className="text-xs md:text-sm font-bold text-orange-950 flex items-center gap-1.5">
+              <span>✨</span>
+              <span>Bí lời rồi? Chọn một văn mẫu để điền nhanh</span>
+            </span>
+            <div className="flex flex-wrap items-center gap-2">
+              {WISH_TOPICS.map((topic) => (
                 <button
+                  key={topic.id}
                   type="button"
-                  onClick={() => {
-                    const next = !isAnonymous;
-                    setIsAnonymous(next);
-                    if (next) setSenderName('');
-                  }}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer border select-none ${
-                    isAnonymous
-                      ? 'bg-rose-50 text-rose-700 border-rose-300 shadow-xs'
-                      : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-slate-900'
-                  }`}
+                  onClick={() => applyWishTopic(topic)}
+                  className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white hover:bg-orange-100/70 text-orange-900 border border-orange-200 shadow-2xs transition cursor-pointer"
                 >
-                  Gửi ẩn danh
+                  {topic.badge}
                 </button>
-              </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Hàng 3: Lời chúc gửi đến thầy cô */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-xs md:text-sm font-bold text-slate-800">
+                Lời chúc gửi đến thầy cô <span className="text-rose-500">*</span>
+              </label>
+              <span className="text-[11px] text-slate-400 italic">
+                Chỉnh sửa tự do sau khi chọn mẫu
+              </span>
             </div>
 
-            {/* 3. Lời chúc 20/11 & Kiểm duyệt thuần phong mỹ tục */}
-            <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <label className="text-xs md:text-sm font-bold text-slate-800">
-                  Lời chúc thầy cô <span className="text-rose-600">*</span>
-                </label>
-              </div>
+            <div className="rounded-2xl border border-slate-200 overflow-hidden focus-within:ring-2 focus-within:ring-orange-500/20 focus-within:border-orange-500 transition">
+              <textarea
+                rows={5}
+                maxLength={250}
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                placeholder="Có điều gì bạn luôn muốn nói với thầy cô? Hãy viết tại đây nhé.."
+                className="w-full p-4 bg-slate-50/40 focus:bg-white text-slate-900 placeholder-slate-400 text-sm outline-none resize-none leading-relaxed transition"
+                required
+              />
 
-              {/* Gợi ý mẫu tri ân 1 hàng ngang */}
-              <div className="grid grid-cols-3 gap-2 mb-2.5">
-                {WISH_TOPICS.map((topic) => (
-                  <button
-                    key={topic.id}
-                    type="button"
-                    onClick={() => applyWishTopic(topic)}
-                    className="w-full text-center py-1.5 px-1.5 text-xs font-semibold rounded-xl bg-amber-50 hover:bg-amber-100/80 text-amber-900 border border-amber-200/70 transition cursor-pointer truncate"
-                  >
-                    {topic.badge}
-                  </button>
-                ))}
-              </div>
-
-              {/* Textarea */}
-              <div className="rounded-2xl border border-slate-200 overflow-hidden focus-within:ring-2 focus-within:ring-rose-500/20 focus-within:border-rose-500 transition">
-                <textarea
-                  rows={4}
-                  maxLength={250}
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  placeholder="Viết những lời tri ân chân thành gửi tới Thầy/Cô..."
-                  className="w-full p-3.5 bg-slate-50/40 focus:bg-white text-slate-900 placeholder-slate-400 text-sm outline-none resize-none leading-relaxed transition"
-                  required
-                />
-
-                {/* Footer thông tin kiểm duyệt */}
-                <div className="px-3.5 py-2 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs">
-                  {!profanityResult.isValid ? (
-                    <div className="flex items-center gap-1.5 text-rose-600 font-semibold">
-                      <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
-                      <span>Nội dung không hợp lệ</span>
-                    </div>
-                  ) : isCharCountExceeded ? (
-                    <div className="flex items-center gap-1.5 text-rose-600 font-semibold">
-                      <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
-                      <span>Vượt quá giới hạn 250</span>
-                    </div>
-                  ) : message.trim().length > 0 ? (
-                    <div className="flex items-center gap-1.5 text-emerald-600 font-medium">
-                      <ShieldCheck className="w-3.5 h-3.5" />
-                      <span>Nội dung hợp lệ</span>
-                    </div>
-                  ) : (
-                    <div />
-                  )}
-
-                  <span className={`text-[11px] font-semibold ${isCharCountExceeded ? 'text-rose-600' : 'text-slate-500'}`}>
-                    {charCount}/250
+              {/* Footer của Textarea */}
+              <div className="px-4 py-2 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs">
+                {!profanityResult.isValid ? (
+                  <div className="flex items-center gap-1.5 text-rose-600 font-semibold">
+                    <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                    <span>Nội dung không hợp lệ</span>
+                  </div>
+                ) : isCharCountExceeded ? (
+                  <div className="flex items-center gap-1.5 text-rose-600 font-semibold">
+                    <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                    <span>Vượt quá giới hạn 250</span>
+                  </div>
+                ) : (
+                  <span className="text-[11px] text-slate-400 italic">
+                    Mỗi lời cảm ơn đều có một câu chuyện riêng ♡
                   </span>
-                </div>
+                )}
+
+                <span className={`text-[11px] font-semibold ${isCharCountExceeded ? 'text-rose-600' : 'text-slate-500'}`}>
+                  {charCount} / 250
+                </span>
               </div>
             </div>
+          </div>
 
-            {/* 4. Chọn phong cách bưu thiếp */}
+          {/* Hàng 4: Hộp lưu ý xanh lá */}
+          <div className="p-3.5 bg-emerald-50/70 border border-emerald-200/80 rounded-2xl text-xs text-emerald-800 flex items-center gap-2">
+            <span className="font-bold">✓</span>
+            <span>Khi nhập nội dung, tấm thiệp bên dưới sẽ cập nhật ngay. Bạn có thể đổi mẫu thiệp mà không mất lời chúc.</span>
+          </div>
+
+        </section>
+
+
+        {/* ========================================================================= */}
+        {/* PHẦN 3: XEM TRƯỚC MẪU THIỆP & GỬI ĐI (THEO ẢNH 4)                          */}
+        {/* ========================================================================= */}
+        <section className="space-y-4">
+          
+          {/* Header phần xem trước */}
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
             <div>
-              <div className="mb-2">
-                <label className="text-xs md:text-sm font-bold text-slate-800 flex items-center gap-1.5">
-                  <Palette className="w-4 h-4 text-rose-600" />
-                  Mẫu bưu thiếp
-                </label>
-              </div>
+              <p className="text-xs font-bold text-orange-600 tracking-wider uppercase mb-1">
+                03 — GÓI GHÉM & GỬI ĐI
+              </p>
+              <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">
+                Tấm thiệp của bạn đã sẵn sàng
+              </h2>
+              <p className="text-xs md:text-sm text-slate-500 mt-1">
+                Kiểm tra lại một lần trước khi gửi lời tri ân.
+              </p>
+            </div>
+            <p className="text-xs text-slate-400 font-medium self-start sm:self-auto">
+              Xem trước thành phẩm
+            </p>
+          </div>
 
-              {/* Danh sách 3 mẫu bưu thiếp */}
-              <div className="grid grid-cols-3 gap-2">
-                {FRAME_STYLES.map((frame) => (
-                  <button
-                    key={frame.id}
-                    type="button"
-                    onClick={() => setSelectedFrame(frame.id)}
-                    className={`py-2 px-3 rounded-xl border text-center transition cursor-pointer ${
-                      selectedFrame === frame.id
-                        ? 'border-rose-500 bg-rose-50 text-rose-700 font-bold ring-2 ring-rose-200/70 shadow-xs'
-                        : 'border-slate-200 hover:border-slate-300 bg-white text-slate-700 font-semibold hover:bg-slate-50'
-                    }`}
-                  >
-                    <span className="text-xs">{frame.name}</span>
-                  </button>
-                ))}
-              </div>
+          {/* Khung trưng bày bưu thiếp xem trước */}
+          <div className="bg-white rounded-3xl p-5 md:p-8 border border-slate-200/90 shadow-sm max-w-4xl mx-auto space-y-6">
+            
+            <div className="w-full rounded-2xl overflow-hidden postcard-shadow bg-[#fcfaf7] p-2 md:p-3 border border-amber-900/10 flex items-center justify-center">
+              <canvas
+                ref={previewCanvasRef}
+                className="w-full h-auto rounded-xl object-contain shadow-xs"
+              />
             </div>
 
-            {/* Nút gửi */}
-            <div className="pt-2">
+            {/* Hàng nút hành động căn giữa */}
+            <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+              <button
+                type="button"
+                onClick={handleDownload}
+                className="px-5 py-2.5 rounded-full border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs md:text-sm font-semibold shadow-xs transition cursor-pointer flex items-center justify-center gap-2"
+              >
+                <ArrowDown className="w-4 h-4 text-slate-600" />
+                <span>Tải thiệp</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => onOpenZoomModal && onOpenZoomModal({
+                  teacher_name: teacherName || 'Quý Thầy Cô kính mến',
+                  sender_name: isAnonymous ? 'BTEC-er' : (senderName || 'Học trò BTEC FPT'),
+                  is_anonymous: isAnonymous,
+                  message: message,
+                  frame_style: selectedFrame
+                })}
+                className="px-5 py-2.5 rounded-full border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs md:text-sm font-semibold shadow-xs transition cursor-pointer flex items-center justify-center gap-2"
+              >
+                <ArrowUpRight className="w-4 h-4 text-slate-600" />
+                <span>Phóng to</span>
+              </button>
+
               <button
                 type="submit"
-                disabled={!canSubmit}
-                className={`w-full py-3.5 px-6 rounded-2xl font-bold text-white shadow-lg flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                disabled={!canSubmit || isSubmitting}
+                className={`px-7 py-2.5 rounded-full font-bold text-white text-xs md:text-sm shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer ${
                   canSubmit
-                    ? 'bg-gradient-to-r from-rose-600 via-rose-700 to-amber-600 hover:from-rose-700 hover:to-amber-700 shadow-rose-900/20 active:scale-[0.99]'
+                    ? 'bg-[#f06428] hover:bg-[#d8551c] shadow-orange-900/20 active:scale-[0.99]'
                     : 'bg-slate-300 text-slate-500 cursor-not-allowed shadow-none'
                 }`}
               >
                 {isSubmitting ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span>Đang hoàn tất thiệp...</span>
+                    <span>Đang gửi thiệp...</span>
                   </>
                 ) : (
                   <>
                     <Send className="w-4 h-4" />
-                    <span>Gửi Lời Chúc & Tạo Thiệp 20/11</span>
+                    <span>Gửi lời tri ân 20/11</span>
                   </>
                 )}
               </button>
-
-              {!canSubmit && (
-                <p className="text-center text-[11px] text-slate-400 mt-2">
-                  {!teacherName.trim()
-                    ? '• Vui lòng nhập tên Thầy/Cô'
-                    : !isAnonymous && !senderName.trim()
-                    ? '• Vui lòng nhập tên người gửi hoặc chọn "Gửi ẩn danh"'
-                    : !message.trim()
-                    ? '• Vui lòng nhập lời chúc'
-                    : isCharCountExceeded
-                    ? '• Lời chúc vượt quá 250 ký tự'
-                    : !profanityResult.isValid
-                    ? '• Nội dung không hợp lệ, không thể gửi thiệp'
-                    : ''}
-                </p>
-              )}
             </div>
 
-          </form>
-        </div>
+            {/* Thông báo nhắc nhở khi chưa điền đủ */}
+            {!canSubmit && (
+              <p className="text-center text-xs text-slate-400">
+                {!teacherName.trim()
+                  ? '• Vui lòng nhập tên Thầy/Cô để hoàn tất thiệp'
+                  : !isAnonymous && !senderName.trim()
+                  ? '• Vui lòng nhập tên người gửi hoặc chọn "Gửi ẩn danh"'
+                  : !message.trim()
+                  ? '• Vui lòng nhập lời chúc thầy cô'
+                  : isCharCountExceeded
+                  ? '• Lời chúc vượt quá giới hạn 250 ký tự'
+                  : !profanityResult.isValid
+                  ? '• Nội dung có từ ngữ không phù hợp'
+                  : ''}
+              </p>
+            )}
 
-        {/* ===================== CỘT PHẢI: BÀN XEM TRƯỚC BƯU THIẾP (7/12) ===================== */}
-        <div className="lg:col-span-7 sticky top-24">
-          
-          <div className="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-xl shadow-slate-900/5">
-            
-            {/* Header thanh công cụ bưu thiếp */}
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-sm md:text-base text-slate-800">
-                Xem Trước Bưu Thiếp
-              </h3>
-
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={handleDownload}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition cursor-pointer"
-                  title="Tải thiệp về máy"
-                >
-                  <Download className="w-3.5 h-3.5 text-slate-600" />
-                  <span>Tải thiệp</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => onOpenZoomModal && onOpenZoomModal({
-                    teacher_name: teacherName || 'Quý Thầy Cô kính mến',
-                    sender_name: isAnonymous ? 'BTEC-er' : (senderName || 'Học trò BTEC FPT'),
-                    is_anonymous: isAnonymous,
-                    message: message,
-                    frame_style: selectedFrame
-                  })}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition cursor-pointer"
-                  title="Phóng to xem chi tiết"
-                >
-                  <Maximize2 className="w-3.5 h-3.5 text-slate-600" />
-                  <span>Phóng to</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Khung trưng bày bưu thiếp (Postcard Presentation Canvas) */}
-            <div className="w-full rounded-2xl overflow-hidden postcard-shadow bg-[#fcfaf7] p-2 border border-amber-900/10 flex items-center justify-center">
-              <canvas
-                ref={previewCanvasRef}
-                className="w-full h-auto rounded-xl object-contain shadow-xs"
-              />
-            </div>
           </div>
 
-        </div>
+        </section>
 
-      </div>
+      </form>
     </div>
   );
 }
