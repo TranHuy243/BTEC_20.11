@@ -43,6 +43,11 @@ export const FRAME_STYLES = [
   }
 ];
 
+// Cấu hình font chữ và cỡ chữ thống nhất cho nhãn và lời chúc trên cả 3 mẫu thiệp
+export const CARD_LABEL_FONT = 'italic 22px "Times New Roman", Georgia, serif';
+export const CARD_LABEL_COLOR = '#2A2522';
+export const CARD_WISH_FONT = 'italic 22px "Times New Roman", Georgia, serif';
+
 // Caching ảnh khung thiệp
 let cachedFrame1Img = null;
 let cachedFrame2Img = null;
@@ -195,7 +200,7 @@ export async function renderCardOnCanvas(canvas, data) {
 /**
  * Vẽ chữ khớp chính xác vào các dòng kẻ của MẪU 1 (Cô giáo & Hoa cúc)
  * Tất cả các dòng kẻ đều thống nhất thành dòng chấm bi (........)
- * Cỡ chữ nội dung, tên thầy cô và người gửi đồng nhất 20px.
+ * Cỡ chữ nhãn (Gửi đến:, Lời chúc:, Người gửi:) và nội dung lời chúc đồng nhất 22px.
  */
 function drawTemplate1Content(ctx, data) {
   ctx.save();
@@ -220,16 +225,36 @@ function drawTemplate1Content(ctx, data) {
   drawDots(260, 230, 650);
   drawDots(445, 246, 650);
 
-  // 1. Tên Thầy/Cô (Nằm trên dòng chấm sau chữ "Gửi đến:")
+  // Phủ nền che các nhãn "Gửi đến:", "Lời chúc:", "Người gửi:" cũ trên ảnh mẫu
+  ctx.save();
+  ctx.fillStyle = '#FCF5EB';
+  ctx.fillRect(125, 195, 105, 30); // Che "Gửi đến:"
+  ctx.fillRect(125, 233, 110, 30); // Che "Lời chúc:"
+  ctx.fillRect(125, 418, 120, 30); // Che "Người gửi:"
+  ctx.restore();
+
+  // Vẽ 3 nhãn chuẩn cùng 1 font và 1 size đồng nhất với Mẫu 2 & Mẫu 3
   ctx.textAlign = 'left';
-  ctx.font = 'bold 20px "Times New Roman", Georgia, serif';
+  ctx.fillStyle = CARD_LABEL_COLOR;
+  ctx.font = CARD_LABEL_FONT;
+  ctx.fillText('Gửi đến:', 135, 218);
+  ctx.fillText('Lời chúc:', 135, 255);
+  ctx.fillText('Người gửi:', 135, 440);
+
+  // 1. Tên Thầy/Cô (Nằm trên dòng chấm sau chữ "Gửi đến:")
+  let teacherFontSize = 22;
+  ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
   ctx.fillStyle = '#1A4329'; // Màu xanh đậm tiệp với màu tiêu đề "Nhà Giáo Việt Nam"
   const teacher = data.teacher_name ? data.teacher_name.trim() : 'Thầy/Cô kính mến';
+  while (ctx.measureText(teacher).width > 410 && teacherFontSize > 13) {
+    teacherFontSize--;
+    ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
+  }
   ctx.fillText(teacher, 232, 218);
 
-  // 2. Nội dung lời chúc (Đồng nhất cỡ chữ 20px)
+  // 2. Nội dung lời chúc (Đồng nhất cỡ chữ 22px, bằng hoặc to hơn nhãn)
   ctx.fillStyle = '#2A2522';
-  ctx.font = 'italic 20px "Times New Roman", Georgia, serif';
+  ctx.font = CARD_WISH_FONT;
 
   const defaultMsg = 'Nhân ngày 20/11, em xin kính chúc Thầy/Cô luôn dồi dào sức khỏe, ngập tràn niềm vui và luôn giữ trọn nhiệt huyết trong sự nghiệp trồng người!';
   const rawText = data.message ? data.message.trim() : defaultMsg;
@@ -272,8 +297,8 @@ function drawTemplate1Content(ctx, data) {
     }
   }
 
-  // 3. Người gửi (Đồng nhất cỡ chữ 20px)
-  let senderFontSize = 20;
+  // 3. Người gửi
+  let senderFontSize = 22;
   ctx.font = `bold ${senderFontSize}px "Times New Roman", Georgia, serif`;
   ctx.fillStyle = '#1A4329';
   const sender = data.is_anonymous 
@@ -298,9 +323,23 @@ function drawTemplate1Content(ctx, data) {
 function drawTemplate2Content(ctx, data) {
   ctx.save();
 
+  // Phủ nền che các nhãn "Gửi đến:", "Lời chúc:" cũ trên ảnh mẫu
+  ctx.save();
+  ctx.fillStyle = '#F6F0E2';
+  ctx.fillRect(492, 138, 108, 30); // Che "Gửi đến:"
+  ctx.fillRect(492, 180, 108, 30); // Che "Lời chúc:"
+  ctx.restore();
+
+  // Vẽ 2 nhãn đầu với cùng 1 font và 1 size đồng nhất với Mẫu 1 & Mẫu 3
+  ctx.textAlign = 'left';
+  ctx.fillStyle = CARD_LABEL_COLOR;
+  ctx.font = CARD_LABEL_FONT;
+  ctx.fillText('Gửi đến:', 502, 161);
+  ctx.fillText('Lời chúc:', 502, 203);
+
   // 1. Tên Thầy/Cô (Nằm trên dòng chấm sau chữ "Gửi đến:")
   ctx.textAlign = 'left';
-  let teacherFontSize = 20;
+  let teacherFontSize = 22;
   ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
   ctx.fillStyle = '#1A4329';
   const teacher = data.teacher_name && data.teacher_name.trim() ? data.teacher_name.trim() : 'Thầy/Cô kính mến';
@@ -310,9 +349,9 @@ function drawTemplate2Content(ctx, data) {
   }
   ctx.fillText(teacher, 605, 161);
 
-  // 2. Nội dung lời chúc (Đồng nhất cỡ chữ 20px trên các dòng chấm)
+  // 2. Nội dung lời chúc (Đồng nhất cỡ chữ 22px, bằng hoặc to hơn nhãn)
   ctx.fillStyle = '#2A2522';
-  ctx.font = 'italic 20px "Times New Roman", Georgia, serif';
+  ctx.font = CARD_WISH_FONT;
 
   const defaultMsg = 'Nhân ngày 20/11, em xin kính chúc Thầy/Cô luôn dồi dào sức khỏe, ngập tràn niềm vui và luôn giữ trọn nhiệt huyết trong từng giờ lên lớp!';
   const rawText = data.message ? data.message.trim() : defaultMsg;
@@ -371,12 +410,12 @@ function drawTemplate2Content(ctx, data) {
     ? 'Một sinh viên BTEC FPT'
     : (data.sender_name && data.sender_name.trim() ? data.sender_name.trim() : 'Học trò BTEC FPT');
 
-  // Đo chiều rộng nhãn và tên người gửi
-  ctx.font = 'italic 20px "Times New Roman", Georgia, serif';
+  // Đo chiều rộng nhãn và tên người gửi với font chuẩn 22px
+  ctx.font = CARD_LABEL_FONT;
   const labelW = ctx.measureText(labelText).width;
   const gap = 8;
 
-  let senderFontSize = 20;
+  let senderFontSize = 22;
   ctx.font = `bold ${senderFontSize}px "Times New Roman", Georgia, serif`;
   let nameW = ctx.measureText(senderRaw).width;
 
@@ -416,9 +455,9 @@ function drawTemplate2Content(ctx, data) {
   ctx.lineTo(RIGHT_BOUND, 522);
   ctx.stroke();
 
-  // Vẽ nhãn "Người gửi:"
-  ctx.fillStyle = '#2A2522';
-  ctx.font = 'italic 20px "Times New Roman", Georgia, serif';
+  // Vẽ nhãn "Người gửi:" cùng 1 font và 1 size
+  ctx.fillStyle = CARD_LABEL_COLOR;
+  ctx.font = CARD_LABEL_FONT;
   ctx.textAlign = 'left';
   ctx.fillText(labelText, labelX, 516);
 
@@ -441,9 +480,23 @@ function drawTemplate2Content(ctx, data) {
 function drawTemplate3Content(ctx, data) {
   ctx.save();
 
+  // Phủ nền che các nhãn "Gửi đến:", "Lời chúc:" cũ trên ảnh mẫu
+  ctx.save();
+  ctx.fillStyle = '#F4ECDC';
+  ctx.fillRect(212, 178, 110, 32); // Che "Gửi đến:"
+  ctx.fillRect(212, 230, 110, 32); // Che "Lời chúc:"
+  ctx.restore();
+
+  // Vẽ 2 nhãn đầu với cùng 1 font và 1 size đồng nhất với Mẫu 1 & Mẫu 2
+  ctx.textAlign = 'left';
+  ctx.fillStyle = CARD_LABEL_COLOR;
+  ctx.font = CARD_LABEL_FONT;
+  ctx.fillText('Gửi đến:', 222, 203);
+  ctx.fillText('Lời chúc:', 222, 255);
+
   // 1. Tên Thầy/Cô (Nằm trên dòng kẻ sau chữ "Gửi đến:")
   ctx.textAlign = 'left';
-  let teacherFontSize = 20;
+  let teacherFontSize = 22;
   ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
   ctx.fillStyle = '#1A4329';
   const teacher = data.teacher_name && data.teacher_name.trim() ? data.teacher_name.trim() : 'Thầy/Cô kính mến';
@@ -453,9 +506,9 @@ function drawTemplate3Content(ctx, data) {
   }
   ctx.fillText(teacher, 330, 203);
 
-  // 2. Nội dung lời chúc (Đồng nhất cỡ chữ 20px trên các dòng kẻ)
+  // 2. Nội dung lời chúc (Đồng nhất cỡ chữ 22px, bằng hoặc to hơn nhãn)
   ctx.fillStyle = '#2A2522';
-  ctx.font = 'italic 20px "Times New Roman", Georgia, serif';
+  ctx.font = CARD_WISH_FONT;
 
   const defaultMsg = 'Nhân ngày 20/11, em xin kính chúc Thầy/Cô luôn dồi dào sức khỏe, ngập tràn niềm vui và luôn giữ trọn nhiệt huyết trong từng giờ lên lớp!';
   const rawText = data.message ? data.message.trim() : defaultMsg;
@@ -511,12 +564,12 @@ function drawTemplate3Content(ctx, data) {
     ? 'Một sinh viên BTEC FPT'
     : (data.sender_name && data.sender_name.trim() ? data.sender_name.trim() : 'Học trò BTEC FPT');
 
-  // Đo chiều rộng nhãn và tên người gửi
-  ctx.font = 'italic 20px "Times New Roman", Georgia, serif';
+  // Đo chiều rộng nhãn và tên người gửi với font chuẩn 22px
+  ctx.font = CARD_LABEL_FONT;
   const labelW = ctx.measureText(labelText).width;
   const gap = 8;
 
-  let senderFontSize = 20;
+  let senderFontSize = 22;
   ctx.font = `bold ${senderFontSize}px "Times New Roman", Georgia, serif`;
   let nameW = ctx.measureText(senderRaw).width;
 
@@ -545,7 +598,7 @@ function drawTemplate3Content(ctx, data) {
   // Phủ màu nền che phần dòng "Người gửi: -----" có sẵn trên ảnh mẫu
   ctx.save();
   ctx.fillStyle = '#F4ECDC';
-  ctx.fillRect(MIN_LABEL_X - 10, 442, (RIGHT_BOUND - MIN_LABEL_X) + 20, 36);
+  ctx.fillRect(MIN_LABEL_X - 10, 438, (RIGHT_BOUND - MIN_LABEL_X) + 20, 36);
 
   // Vẽ hàng chấm bi (........) ở dưới chân người gửi đồng nhất từ sau "Người gửi:" đến hết lề phải
   ctx.strokeStyle = '#231C12';
@@ -556,9 +609,9 @@ function drawTemplate3Content(ctx, data) {
   ctx.lineTo(RIGHT_BOUND, 466);
   ctx.stroke();
 
-  // Vẽ nhãn "Người gửi:"
-  ctx.fillStyle = '#2A2522';
-  ctx.font = 'italic 20px "Times New Roman", Georgia, serif';
+  // Vẽ nhãn "Người gửi:" cùng 1 font và 1 size
+  ctx.fillStyle = CARD_LABEL_COLOR;
+  ctx.font = CARD_LABEL_FONT;
   ctx.textAlign = 'left';
   ctx.fillText(labelText, labelX, 460);
 

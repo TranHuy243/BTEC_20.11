@@ -170,13 +170,13 @@ export default function LivePresentationView({ wishes = [], onExit }) {
 
         {/* Góc phải: Mã QR quét gửi lời chúc */}
         <div className="flex items-center">
-          <div className="bg-white/95 p-2 md:p-2.5 rounded-2xl md:rounded-3xl shadow-2xl border border-white/30 flex flex-col items-center justify-center backdrop-blur-xs group">
+          <div className="bg-white/95 p-3 md:p-3.5 lg:p-4 rounded-2xl md:rounded-3xl shadow-2xl border border-white/30 flex flex-col items-center justify-center backdrop-blur-xs group">
             <img
               src="/qr-code.png"
               alt="Quét QR để gửi lời chúc"
-              className="w-16 h-16 md:w-22 md:h-22 lg:w-26 lg:h-26 object-contain rounded-xl"
+              className="w-22 h-22 md:w-28 md:h-28 lg:w-34 lg:h-34 object-contain rounded-xl"
             />
-            <span className="text-[10px] md:text-xs font-bold text-slate-800 tracking-tight mt-1 text-center whitespace-nowrap">
+            <span className="text-xs md:text-sm font-extrabold text-slate-800 tracking-tight mt-1.5 text-center whitespace-nowrap">
               Quét QR để gửi lời chúc 💌
             </span>
           </div>
