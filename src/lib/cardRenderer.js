@@ -225,24 +225,9 @@ function drawTemplate1Content(ctx, data) {
   drawDots(260, 230, 650);
   drawDots(445, 246, 650);
 
-  // Phủ nền che các nhãn "Gửi đến:", "Lời chúc:", "Người gửi:" cũ trên ảnh mẫu
-  ctx.save();
-  ctx.fillStyle = '#FCF5EB';
-  ctx.fillRect(125, 195, 105, 30); // Che "Gửi đến:"
-  ctx.fillRect(125, 233, 110, 30); // Che "Lời chúc:"
-  ctx.fillRect(125, 418, 120, 30); // Che "Người gửi:"
-  ctx.restore();
-
-  // Vẽ 3 nhãn chuẩn cùng 1 font và 1 size đồng nhất với Mẫu 2 & Mẫu 3
-  ctx.textAlign = 'left';
-  ctx.fillStyle = CARD_LABEL_COLOR;
-  ctx.font = CARD_LABEL_FONT;
-  ctx.fillText('Gửi đến:', 135, 218);
-  ctx.fillText('Lời chúc:', 135, 255);
-  ctx.fillText('Người gửi:', 135, 440);
-
   // 1. Tên Thầy/Cô (Nằm trên dòng chấm sau chữ "Gửi đến:")
   let teacherFontSize = 22;
+  ctx.textAlign = 'left';
   ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
   ctx.fillStyle = '#1A4329'; // Màu xanh đậm tiệp với màu tiêu đề "Nhà Giáo Việt Nam"
   const teacher = data.teacher_name ? data.teacher_name.trim() : 'Thầy/Cô kính mến';
@@ -323,19 +308,19 @@ function drawTemplate1Content(ctx, data) {
 function drawTemplate2Content(ctx, data) {
   ctx.save();
 
-  // Phủ nền che các nhãn "Gửi đến:", "Lời chúc:" cũ trên ảnh mẫu
+  // Phủ nền che hoàn toàn các chữ thư pháp "Gửi đến:", "Lời chúc:" cũ trên ảnh mẫu (từ x=448 bao gồm nét chữ uốn lượn)
   ctx.save();
   ctx.fillStyle = '#F6F0E2';
-  ctx.fillRect(492, 138, 108, 30); // Che "Gửi đến:"
-  ctx.fillRect(492, 180, 108, 30); // Che "Lời chúc:"
+  ctx.fillRect(448, 130, 140, 40); // Che toàn bộ cụm "Gửi đến:" bao gồm chữ G thư pháp
+  ctx.fillRect(448, 172, 140, 40); // Che toàn bộ cụm "Lời chúc:" bao gồm chữ L thư pháp
   ctx.restore();
 
   // Vẽ 2 nhãn đầu với cùng 1 font và 1 size đồng nhất với Mẫu 1 & Mẫu 3
   ctx.textAlign = 'left';
   ctx.fillStyle = CARD_LABEL_COLOR;
   ctx.font = CARD_LABEL_FONT;
-  ctx.fillText('Gửi đến:', 502, 161);
-  ctx.fillText('Lời chúc:', 502, 203);
+  ctx.fillText('Gửi đến:', 480, 161);
+  ctx.fillText('Lời chúc:', 480, 203);
 
   // 1. Tên Thầy/Cô (Nằm trên dòng chấm sau chữ "Gửi đến:")
   ctx.textAlign = 'left';
@@ -483,8 +468,8 @@ function drawTemplate3Content(ctx, data) {
   // Phủ nền che các nhãn "Gửi đến:", "Lời chúc:" cũ trên ảnh mẫu
   ctx.save();
   ctx.fillStyle = '#F4ECDC';
-  ctx.fillRect(212, 178, 110, 32); // Che "Gửi đến:"
-  ctx.fillRect(212, 230, 110, 32); // Che "Lời chúc:"
+  ctx.fillRect(210, 172, 115, 38); // Che "Gửi đến:"
+  ctx.fillRect(210, 224, 115, 38); // Che "Lời chúc:"
   ctx.restore();
 
   // Vẽ 2 nhãn đầu với cùng 1 font và 1 size đồng nhất với Mẫu 1 & Mẫu 2
