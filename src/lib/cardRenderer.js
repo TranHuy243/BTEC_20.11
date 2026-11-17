@@ -277,7 +277,7 @@ function drawTemplate1Content(ctx, data) {
   ctx.font = `bold ${senderFontSize}px "Times New Roman", Georgia, serif`;
   ctx.fillStyle = '#1A4329';
   const sender = data.is_anonymous 
-    ? 'BTEC-er' 
+    ? 'Một sinh viên BTEC FPT' 
     : (data.sender_name && data.sender_name.trim() ? data.sender_name.trim() : 'Học trò BTEC FPT');
   while (ctx.measureText(sender).width > 390 && senderFontSize > 13) {
     senderFontSize--;
@@ -368,7 +368,7 @@ function drawTemplate2Content(ctx, data) {
   const labelText = 'Người gửi:';
 
   const senderRaw = data.is_anonymous
-    ? 'BTEC-er'
+    ? 'Một sinh viên BTEC FPT'
     : (data.sender_name && data.sender_name.trim() ? data.sender_name.trim() : 'Học trò BTEC FPT');
 
   // Đo chiều rộng nhãn và tên người gửi
@@ -508,7 +508,7 @@ function drawTemplate3Content(ctx, data) {
   const labelText = 'Người gửi:';
 
   const senderRaw = data.is_anonymous
-    ? 'BTEC-er'
+    ? 'Một sinh viên BTEC FPT'
     : (data.sender_name && data.sender_name.trim() ? data.sender_name.trim() : 'Học trò BTEC FPT');
 
   // Đo chiều rộng nhãn và tên người gửi
@@ -679,7 +679,7 @@ function drawOverlayContent(ctx, data, isChalk) {
 
   ctx.font = 'bold 21px "Times New Roman", Georgia, serif';
   ctx.fillStyle = isChalk ? '#FDE68A' : isDarkNavy ? '#FBBF24' : '#991B1B';
-  const senderName = data.is_anonymous ? 'BTEC-er' : (data.sender_name || 'Học trò BTEC FPT');
+  const senderName = data.is_anonymous ? 'Một sinh viên BTEC FPT' : (data.sender_name || 'Học trò BTEC FPT');
   ctx.fillText(senderName, rightX, footerY);
 }
 

@@ -130,7 +130,7 @@ export default function WishFeed({ wishes, onSelectWish }) {
                   </div>
                   <div className="flex items-center gap-2 text-slate-500 text-[11px] truncate mt-1 ml-5.5">
                     <span className="truncate">
-                      Từ: <strong className="font-semibold text-slate-700">{wish.is_anonymous ? 'BTEC-er' : wish.sender_name}</strong>
+                      Từ: <strong className="font-semibold text-slate-700">{wish.is_anonymous ? 'Một sinh viên BTEC FPT' : wish.sender_name}</strong>
                     </span>
                     {wish.created_at && (
                       <>

@@ -117,7 +117,7 @@ export async function getWishes() {
 export async function addWish(wishData) {
   const newWish = {
     teacher_name: wishData.teacher_name.trim(),
-    sender_name: wishData.is_anonymous ? 'BTEC-er' : (wishData.sender_name.trim() || 'Sinh viên BTEC FPT'),
+    sender_name: wishData.is_anonymous ? 'Một sinh viên BTEC FPT' : (wishData.sender_name.trim() || 'Một sinh viên BTEC FPT'),
     is_anonymous: Boolean(wishData.is_anonymous),
     message: wishData.message.trim(),
     frame_style: wishData.frame_style || 'luxury_cream',

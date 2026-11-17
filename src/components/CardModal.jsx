@@ -25,13 +25,13 @@ export default function CardModal({ wish, onClose, isNew = false }) {
       try {
         await navigator.share({
           title: `Bưu Thiếp 20/11 gửi ${wish.teacher_name}`,
-          text: `"${wish.message}" - Người gửi: ${wish.is_anonymous ? 'BTEC-er' : wish.sender_name}`,
+          text: `"${wish.message}" - Người gửi: ${wish.is_anonymous ? 'Một sinh viên BTEC FPT' : wish.sender_name}`,
           url: window.location.href,
         });
       } catch (err) {}
     } else {
       navigator.clipboard.writeText(
-        `[Tri Ân 20/11] Gửi ${wish.teacher_name}: "${wish.message}" - ${wish.is_anonymous ? 'BTEC-er' : wish.sender_name}`
+        `[Tri Ân 20/11] Gửi ${wish.teacher_name}: "${wish.message}" - ${wish.is_anonymous ? 'Một sinh viên BTEC FPT' : wish.sender_name}`
       );
       alert('Đã sao chép nội dung lời chúc vào bộ nhớ tạm!');
     }

@@ -476,7 +476,7 @@ export default function AdminDashboard({ wishes, onRefreshWishes, onBackToSite, 
                             <span className={`px-2 py-0.5 rounded-md text-xs font-medium ${
                               w.is_anonymous ? 'bg-amber-50 text-amber-800 border border-amber-200' : 'bg-slate-100 text-slate-800'
                             }`}>
-                              {w.is_anonymous ? 'BTEC-er' : w.sender_name}
+                              {w.is_anonymous ? 'Một sinh viên BTEC FPT' : w.sender_name}
                             </span>
                           </td>
                           <td className="p-3.5 max-w-md text-slate-600 leading-relaxed italic">

@@ -86,7 +86,7 @@ export default function WishForm({ onWishSubmitted, onOpenZoomModal }) {
     if (previewCanvasRef.current) {
       renderCardOnCanvas(previewCanvasRef.current, {
         teacher_name: teacherName || 'Quý Thầy Cô kính mến',
-        sender_name: isAnonymous ? 'BTEC-er' : (senderName || 'Học trò BTEC FPT'),
+        sender_name: isAnonymous ? 'Một sinh viên BTEC FPT' : (senderName || 'Học trò BTEC FPT'),
         is_anonymous: isAnonymous,
         message: message,
         frame_style: selectedFrame
@@ -121,7 +121,7 @@ export default function WishForm({ onWishSubmitted, onOpenZoomModal }) {
     try {
       const wishData = {
         teacher_name: teacherName,
-        sender_name: isAnonymous ? 'BTEC-er' : senderName,
+        sender_name: isAnonymous ? 'Một sinh viên BTEC FPT' : senderName,
         is_anonymous: isAnonymous,
         message: message,
         frame_style: selectedFrame
@@ -184,8 +184,8 @@ export default function WishForm({ onWishSubmitted, onOpenZoomModal }) {
                   key={frame.id}
                   onClick={() => setSelectedFrame(frame.id)}
                   className={`group relative rounded-3xl overflow-hidden bg-white border-2 transition-all duration-200 cursor-pointer ${isSelected
-                      ? 'border-orange-500 shadow-xl ring-4 ring-orange-100 scale-[1.01]'
-                      : 'border-slate-200 hover:border-slate-300 hover:shadow-md'
+                    ? 'border-orange-500 shadow-xl ring-4 ring-orange-100 scale-[1.01]'
+                    : 'border-slate-200 hover:border-slate-300 hover:shadow-md'
                     }`}
                 >
                   {/* Ảnh thu nhỏ của mẫu thiệp */}
@@ -253,7 +253,7 @@ export default function WishForm({ onWishSubmitted, onOpenZoomModal }) {
               {/* Cột 1: Tên thầy/cô nhận thiệp */}
               <div ref={teacherDropdownRef} className="relative">
                 <label className="block text-xs md:text-sm font-bold text-slate-800 mb-2">
-                  Tên thầy/cô nhận thiệp <span className="text-rose-500">*</span>
+                  Gửi đến thầy/cô nhận thiệp <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -267,7 +267,7 @@ export default function WishForm({ onWishSubmitted, onOpenZoomModal }) {
                       setIsTeacherDropdownOpen(true);
                     }
                   }}
-                  placeholder="Ví dụ: Cô Nguyễn Thị..."
+                  placeholder="Nhập tên Thầy/Cô"
                   className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 placeholder-slate-400 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition"
                   required
                 />
@@ -300,70 +300,59 @@ export default function WishForm({ onWishSubmitted, onOpenZoomModal }) {
                   <span className="text-[11px] text-slate-400">Tối đa 60 ký tự</span>
                 </div>
 
-                <input
-                  type="text"
-                  maxLength={60}
-                  value={senderName}
-                  onChange={(e) => setSenderName(e.target.value)}
-                  disabled={isAnonymous}
-                  placeholder={isAnonymous ? 'BTEC-er (Ẩn danh)' : 'Ví dụ: Nguyễn Văn A'}
-                  className={`w-full px-4 py-2.5 rounded-xl border text-sm transition focus:outline-none ${isAnonymous
-                      ? 'bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed italic'
+                <div className="relative flex items-center">
+                  <input
+                    type="text"
+                    maxLength={60}
+                    value={isAnonymous ? 'Một sinh viên BTEC FPT' : senderName}
+                    onChange={(e) => {
+                      if (!isAnonymous) setSenderName(e.target.value);
+                    }}
+                    disabled={isAnonymous}
+                    placeholder="Nhập tên người gửi"
+                    className={`w-full pl-4 pr-32 py-2.5 rounded-xl border text-sm transition focus:outline-none ${isAnonymous
+                      ? 'bg-orange-50/70 border-orange-200 text-orange-950 font-medium'
                       : 'bg-white border-slate-200 text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500'
-                    }`}
-                />
-
-                <div className="flex items-center justify-between mt-2 text-xs">
-                  <span className="text-[11px] text-slate-400">
-                    Người gửi được hiển thị trên thiệp
-                  </span>
-                  <label className="inline-flex items-center gap-1.5 cursor-pointer select-none">
-                    <input
-                      type="checkbox"
-                      checked={isAnonymous}
-                      onChange={(e) => {
-                        const next = e.target.checked;
-                        setIsAnonymous(next);
-                        if (next) setSenderName('');
-                      }}
-                      className="w-4 h-4 rounded text-orange-600 focus:ring-orange-500 border-slate-300 cursor-pointer"
-                    />
-                    <span className="text-xs font-semibold text-slate-700">Gửi ẩn danh</span>
-                  </label>
+                      }`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const next = !isAnonymous;
+                      setIsAnonymous(next);
+                      if (next) setSenderName('');
+                    }}
+                    className={`absolute right-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer select-none flex items-center gap-1 ${isAnonymous
+                      ? 'bg-orange-500 text-white shadow-xs hover:bg-orange-600'
+                      : 'bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200/80'
+                      }`}
+                  >
+                    <span>{isAnonymous ? '✓ Ẩn danh' : 'Gửi ẩn danh'}</span>
+                  </button>
                 </div>
               </div>
 
             </div>
 
-            {/* Hàng 2: Văn mẫu điền nhanh */}
-            <div className="p-3.5 md:p-4 rounded-2xl bg-[#FFF8F3] border border-orange-200/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <span className="text-xs md:text-sm font-bold text-orange-950 flex items-center gap-1.5">
-                <span>✨</span>
-                <span>Bí lời rồi? Chọn một văn mẫu để điền nhanh</span>
-              </span>
-              <div className="flex flex-wrap items-center gap-2">
-                {WISH_TOPICS.map((topic) => (
-                  <button
-                    key={topic.id}
-                    type="button"
-                    onClick={() => applyWishTopic(topic)}
-                    className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white hover:bg-orange-100/70 text-orange-900 border border-orange-200 shadow-2xs transition cursor-pointer"
-                  >
-                    {topic.badge}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Hàng 3: Lời chúc gửi đến thầy cô */}
+            {/* Hàng 2: Lời chúc gửi đến thầy cô & Dải văn mẫu tri ân 1 2 3 */}
             <div>
-              <div className="flex items-center justify-between mb-2">
+              <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
                 <label className="text-xs md:text-sm font-bold text-slate-800">
                   Lời chúc gửi đến thầy cô <span className="text-rose-500">*</span>
                 </label>
-                <span className="text-[11px] text-slate-400 italic">
-                  Chỉnh sửa tự do sau khi chọn mẫu
-                </span>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs text-slate-400 mr-1 hidden sm:inline">Văn mẫu:</span>
+                  {WISH_TOPICS.map((topic) => (
+                    <button
+                      key={topic.id}
+                      type="button"
+                      onClick={() => applyWishTopic(topic)}
+                      className="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 hover:bg-orange-50 hover:text-orange-600 hover:border-orange-200 text-slate-700 border border-slate-200/80 transition cursor-pointer"
+                    >
+                      {topic.badge}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               <div className="rounded-2xl border border-slate-200 overflow-hidden focus-within:ring-2 focus-within:ring-orange-500/20 focus-within:border-orange-500 transition">
@@ -390,9 +379,7 @@ export default function WishForm({ onWishSubmitted, onOpenZoomModal }) {
                       <span>Vượt quá giới hạn 250</span>
                     </div>
                   ) : (
-                    <span className="text-[11px] text-slate-400 italic">
-                      Mỗi lời cảm ơn đều có một câu chuyện riêng ♡
-                    </span>
+                    <span />
                   )}
 
                   <span className={`text-[11px] font-semibold ${isCharCountExceeded ? 'text-rose-600' : 'text-slate-500'}`}>
@@ -400,12 +387,6 @@ export default function WishForm({ onWishSubmitted, onOpenZoomModal }) {
                   </span>
                 </div>
               </div>
-            </div>
-
-            {/* Hàng 4: Hộp lưu ý xanh lá */}
-            <div className="p-3.5 bg-emerald-50/70 border border-emerald-200/80 rounded-2xl text-xs text-emerald-800 flex items-center gap-2">
-              <span className="font-bold">✓</span>
-              <span>Khi nhập nội dung, tấm thiệp bên dưới sẽ cập nhật ngay. Bạn có thể đổi mẫu thiệp mà không mất lời chúc.</span>
             </div>
 
           </div>
@@ -460,7 +441,7 @@ export default function WishForm({ onWishSubmitted, onOpenZoomModal }) {
                 type="button"
                 onClick={() => onOpenZoomModal && onOpenZoomModal({
                   teacher_name: teacherName || 'Quý Thầy Cô kính mến',
-                  sender_name: isAnonymous ? 'BTEC-er' : (senderName || 'Học trò BTEC FPT'),
+                  sender_name: isAnonymous ? 'Một sinh viên BTEC FPT' : (senderName || 'Học trò BTEC FPT'),
                   is_anonymous: isAnonymous,
                   message: message,
                   frame_style: selectedFrame
@@ -475,8 +456,8 @@ export default function WishForm({ onWishSubmitted, onOpenZoomModal }) {
                 type="submit"
                 disabled={!canSubmit || isSubmitting}
                 className={`px-7 py-2.5 rounded-full font-bold text-white text-xs md:text-sm shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer ${canSubmit
-                    ? 'bg-[#f06428] hover:bg-[#d8551c] shadow-orange-900/20 active:scale-[0.99]'
-                    : 'bg-slate-300 text-slate-500 cursor-not-allowed shadow-none'
+                  ? 'bg-[#f06428] hover:bg-[#d8551c] shadow-orange-900/20 active:scale-[0.99]'
+                  : 'bg-slate-300 text-slate-500 cursor-not-allowed shadow-none'
                   }`}
               >
                 {isSubmitting ? (
