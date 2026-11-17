@@ -178,9 +178,6 @@ export default function WishForm({ onWishSubmitted, onOpenZoomModal }) {
               <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">
                 Chọn tấm thiệp bạn thích
               </h2>
-              <p className="text-xs md:text-sm text-slate-500 mt-1">
-                Ba phong cách khác nhau, cùng dành cho một lời cảm ơn.
-              </p>
             </div>
             <p className="text-xs text-slate-400 font-medium self-start sm:self-auto">
               Chọn một mẫu để tiếp tục ↓
