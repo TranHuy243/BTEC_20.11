@@ -51,6 +51,17 @@ const DEFAULT_MODERATORS = [
   }
 ];
 
+export function normalizeTeacherPrefix(name) {
+  if (!name || typeof name !== 'string') return name;
+  let trimmed = name.trim();
+  trimmed = trimmed
+    .replace(/^thầy\/cô/i, 'thầy/cô')
+    .replace(/^thầy\s+/i, 'thầy ')
+    .replace(/^cô\s+/i, 'cô ')
+    .replace(/^quý\s+thầy\s+cô/i, 'quý thầy cô');
+  return trimmed;
+}
+
 function getLocalWishes() {
   try {
     const data = localStorage.getItem(LOCAL_STORAGE_WISHES_KEY);
@@ -58,7 +69,11 @@ function getLocalWishes() {
       localStorage.setItem(LOCAL_STORAGE_WISHES_KEY, JSON.stringify(DEFAULT_SAMPLE_WISHES));
       return DEFAULT_SAMPLE_WISHES;
     }
-    return JSON.parse(data);
+    const parsed = JSON.parse(data);
+    return parsed.map((w) => ({
+      ...w,
+      teacher_name: normalizeTeacherPrefix(w.teacher_name)
+    }));
   } catch (e) {
     return DEFAULT_SAMPLE_WISHES;
   }
@@ -101,7 +116,11 @@ export async function getWishes() {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return { data: data || [], source: 'supabase' };
+      const normalizedData = (data || []).map((w) => ({
+        ...w,
+        teacher_name: normalizeTeacherPrefix(w.teacher_name)
+      }));
+      return { data: normalizedData, source: 'supabase' };
     } catch (err) {
       console.warn('Lỗi kết nối Supabase, chuyển local:', err);
       return { data: getLocalWishes(), source: 'local' };
@@ -116,7 +135,7 @@ export async function getWishes() {
  */
 export async function addWish(wishData) {
   const newWish = {
-    teacher_name: wishData.teacher_name.trim(),
+    teacher_name: normalizeTeacherPrefix(wishData.teacher_name ? wishData.teacher_name.trim() : ''),
     sender_name: wishData.is_anonymous ? 'Một sinh viên BTEC FPT' : (wishData.sender_name.trim() || 'Một sinh viên BTEC FPT'),
     is_anonymous: Boolean(wishData.is_anonymous),
     message: wishData.message.trim(),

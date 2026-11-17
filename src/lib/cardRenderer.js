@@ -212,11 +212,26 @@ function drawCardDottedLine(ctx, x1, y, x2, color = '#788896') {
   ctx.restore();
 }
 
+export function normalizeTeacherPrefix(name) {
+  if (!name || typeof name !== 'string') return name;
+  let trimmed = name.trim();
+  trimmed = trimmed
+    .replace(/^thầy\/cô/i, 'thầy/cô')
+    .replace(/^thầy\s+/i, 'thầy ')
+    .replace(/^cô\s+/i, 'cô ')
+    .replace(/^quý\s+thầy\s+cô/i, 'quý thầy cô');
+  return trimmed;
+}
+
 /**
  * Render thiệp lên Canvas
  */
-export async function renderCardOnCanvas(canvas, data) {
-  if (!canvas) return;
+export async function renderCardOnCanvas(canvas, rawData) {
+  if (!canvas || !rawData) return;
+  const data = {
+    ...rawData,
+    teacher_name: normalizeTeacherPrefix(rawData.teacher_name || '')
+  };
   const ctx = canvas.getContext('2d');
   canvas.width = CARD_WIDTH;
   canvas.height = CARD_HEIGHT;
@@ -333,7 +348,7 @@ function drawTemplate1Content(ctx, data) {
   ctx.textAlign = 'left';
   ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
   ctx.fillStyle = '#164329'; // Màu xanh đậm tiệp màu banner tiêu đề
-  const teacher = data.teacher_name ? data.teacher_name.trim() : 'Thầy/Cô kính mến';
+  const teacher = data.teacher_name ? data.teacher_name.trim() : 'thầy/cô kính mến';
   while (ctx.measureText(teacher).width > 440 && teacherFontSize > 13) {
     teacherFontSize--;
     ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
@@ -391,7 +406,7 @@ function drawTemplate2Content(ctx, data) {
   ctx.textAlign = 'left';
   ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
   ctx.fillStyle = '#FFFDF0'; // Màu kem ngà sáng nổi bật trên nền xanh đậm
-  const teacher = data.teacher_name && data.teacher_name.trim() ? data.teacher_name.trim() : 'Thầy/Cô kính mến';
+  const teacher = data.teacher_name && data.teacher_name.trim() ? data.teacher_name.trim() : 'thầy/cô kính mến';
   while (ctx.measureText(teacher).width > 410 && teacherFontSize > 13) {
     teacherFontSize--;
     ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
@@ -463,7 +478,7 @@ function drawTemplate3Content(ctx, data) {
   ctx.textAlign = 'left';
   ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
   ctx.fillStyle = '#164329';
-  const teacher = data.teacher_name && data.teacher_name.trim() ? data.teacher_name.trim() : 'Thầy/Cô kính mến';
+  const teacher = data.teacher_name && data.teacher_name.trim() ? data.teacher_name.trim() : 'thầy/cô kính mến';
   while (ctx.measureText(teacher).width > 440 && teacherFontSize > 13) {
     teacherFontSize--;
     ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
@@ -520,7 +535,7 @@ function drawTemplate4Content(ctx, data) {
   ctx.textAlign = 'left';
   ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
   ctx.fillStyle = '#0F2942'; // Xanh navy đậm phong cách bưu chính quốc tế
-  const teacher = data.teacher_name ? data.teacher_name.trim() : 'Thầy/Cô kính mến';
+  const teacher = data.teacher_name ? data.teacher_name.trim() : 'thầy/cô kính mến';
   while (ctx.measureText(teacher).width > 400 && teacherFontSize > 13) {
     teacherFontSize--;
     ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
@@ -612,7 +627,7 @@ function drawTemplate5Content(ctx, data) {
   ctx.textAlign = 'left';
   ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
   ctx.fillStyle = '#0F2942';
-  const teacher = data.teacher_name ? data.teacher_name.trim() : 'Thầy/Cô kính mến';
+  const teacher = data.teacher_name ? data.teacher_name.trim() : 'thầy/cô kính mến';
   while (ctx.measureText(teacher).width > 260 && teacherFontSize > 13) {
     teacherFontSize--;
     ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
@@ -727,7 +742,7 @@ function drawTemplate6Content(ctx, data) {
   ctx.textAlign = 'left';
   ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
   ctx.fillStyle = '#0F2942';
-  const teacher = data.teacher_name ? data.teacher_name.trim() : 'Thầy/Cô kính mến';
+  const teacher = data.teacher_name ? data.teacher_name.trim() : 'thầy/cô kính mến';
   while (ctx.measureText(teacher).width > 460 && teacherFontSize > 13) {
     teacherFontSize--;
     ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
@@ -853,7 +868,7 @@ function drawOverlayContent(ctx, data, isChalk) {
   const prefixW = ctx.measureText('Kính gửi Thầy/Cô: ').width;
   ctx.font = 'bold 28px "Times New Roman", Georgia, serif';
   ctx.fillStyle = isChalk ? '#FDE68A' : isDarkNavy ? '#FCD34D' : '#991B1B';
-  ctx.fillText(data.teacher_name || 'Quý Thầy Cô kính mến', startX + prefixW, 135);
+  ctx.fillText(data.teacher_name || 'quý thầy cô kính mến', startX + prefixW, 135);
 
   ctx.fillStyle = isChalk ? '#F3F4F6' : isDarkNavy ? '#F8FAFC' : '#1C1917';
   ctx.font = 'italic 21px "Times New Roman", Georgia, serif';

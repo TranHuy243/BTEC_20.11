@@ -100,7 +100,7 @@ export default function WishForm({ onWishSubmitted, onOpenZoomModal }) {
   useEffect(() => {
     if (previewCanvasRef.current) {
       renderCardOnCanvas(previewCanvasRef.current, {
-        teacher_name: teacherName || 'Quý Thầy Cô kính mến',
+        teacher_name: teacherName || 'quý thầy cô kính mến',
         sender_name: isAnonymous ? 'Một sinh viên BTEC FPT' : (senderName || 'Học trò BTEC FPT'),
         is_anonymous: isAnonymous,
         message: message,
@@ -457,7 +457,7 @@ export default function WishForm({ onWishSubmitted, onOpenZoomModal }) {
               <button
                 type="button"
                 onClick={() => onOpenZoomModal && onOpenZoomModal({
-                  teacher_name: teacherName || 'Quý Thầy Cô kính mến',
+                  teacher_name: teacherName || 'quý thầy cô kính mến',
                   sender_name: isAnonymous ? 'Một sinh viên BTEC FPT' : (senderName || 'Học trò BTEC FPT'),
                   is_anonymous: isAnonymous,
                   message: message,
