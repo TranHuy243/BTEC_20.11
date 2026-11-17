@@ -115,6 +115,7 @@ export default function LivePresentationView({ wishes = [], onExit }) {
   return (
     <div
       ref={containerRef}
+      onDoubleClick={toggleFullscreen}
       className={`fixed inset-0 z-50 flex flex-col justify-between overflow-hidden select-none font-sans transition-colors duration-500 relative ${isForestKV
           ? 'bg-gradient-to-br from-[#091c13] via-[#123824] to-[#07180f] text-white'
           : isSageMint
@@ -202,25 +203,6 @@ export default function LivePresentationView({ wishes = [], onExit }) {
           </div>
         )}
       </main>
-
-      {/* ===================== FOOTER ===================== */}
-      <footer className="relative z-30 px-8 md:px-14 py-4 flex items-center justify-between text-xs text-white/60">
-        <div />
-        
-        {/* Nút toàn màn hình chuyển xuống dưới bên cạnh X lời tri ân */}
-        <div className="flex items-center gap-3">
-          <span className="font-bold text-white/80">
-            {wishes.length} lời tri ân
-          </span>
-          <button
-            onClick={toggleFullscreen}
-            className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white/70 hover:text-white border border-white/15 transition cursor-pointer shadow-sm flex items-center justify-center"
-            title={isFullscreen ? 'Thu nhỏ màn hình (Phím F hoặc Esc)' : 'Phóng to toàn màn hình (Phím F)'}
-          >
-            {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
-          </button>
-        </div>
-      </footer>
 
       {/* ===================== MODAL PHÓNG TO CHI TIẾT KHI CHẠM VÀO THIỆP ===================== */}
       {selectedWishForDetail && (

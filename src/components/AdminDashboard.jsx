@@ -901,17 +901,6 @@ export default function AdminDashboard({ wishes, onRefreshWishes, onBackToSite, 
                   )}
                 </div>
 
-                {/* Footer Preview */}
-                <div className="flex items-center justify-between text-[10px] text-white/50 relative z-10">
-                  <div />
-                  <div className="flex items-center gap-2">
-                    <div>{wishes.length} lời tri ân</div>
-                    <div className="p-1 rounded bg-white/10 text-white/70">
-                      <Maximize2 className="w-3 h-3" />
-                    </div>
-                  </div>
-                </div>
-
                 {/* Hover overlay hint */}
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-xs z-20">
                   <span className="px-5 py-2.5 rounded-2xl bg-white text-slate-900 font-extrabold text-xs shadow-xl flex items-center gap-2">
