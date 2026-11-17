@@ -412,9 +412,6 @@ export default function WishForm({ onWishSubmitted, onOpenZoomModal }) {
               <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">
                 Tấm thiệp của bạn đã sẵn sàng
               </h2>
-              <p className="text-xs md:text-sm text-slate-500 mt-1">
-                Kiểm tra lại một lần trước khi gửi lời tri ân.
-              </p>
             </div>
             <p className="text-xs text-slate-400 font-medium self-start sm:self-auto">
               Xem trước thành phẩm
@@ -422,7 +419,7 @@ export default function WishForm({ onWishSubmitted, onOpenZoomModal }) {
           </div>
 
           {/* Khung trưng bày bưu thiếp xem trước */}
-          <div className="bg-white rounded-3xl p-5 md:p-8 border border-slate-200/90 shadow-sm max-w-4xl mx-auto space-y-6">
+          <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-200/90 shadow-sm space-y-6">
 
             <div className="w-full rounded-2xl overflow-hidden postcard-shadow bg-[#fcfaf7] p-2 md:p-3 border border-amber-900/10 flex items-center justify-center">
               <canvas
