@@ -34,7 +34,8 @@ export const TEACHERS_LIST = [
   'Cô Nguyễn Thị Hồng Nhung',
   'Cô Lê Thị Hồng Ngọc',
   'Cô Phạm Thị Thanh Hằng',
-  'Thầy Nguyễn Trần Bảo Quân'
+  'Thầy Nguyễn Trần Bảo Quân',
+  'Thầy Trần Đức Hùng'
 ];
 
 /**
@@ -56,7 +57,7 @@ export function removeVietnameseTones(str) {
 export function searchTeachers(query) {
   if (!query || !query.trim()) return [];
   const cleanQuery = removeVietnameseTones(query.trim());
-  
+
   return TEACHERS_LIST.filter((teacher) => {
     const cleanTeacher = removeVietnameseTones(teacher);
     return cleanTeacher.includes(cleanQuery);
