@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   Send, ArrowDown, ArrowUpRight, AlertTriangle,
-  PenTool
+  PenTool, CheckCircle
 } from 'lucide-react';
 import { checkProfanity } from '../lib/profanityFilter';
 import {
@@ -377,6 +377,11 @@ export default function WishForm({ onWishSubmitted, onOpenZoomModal }) {
                     <div className="flex items-center gap-1.5 text-rose-600 font-semibold">
                       <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
                       <span>Vượt quá giới hạn 250</span>
+                    </div>
+                  ) : message.trim().length > 0 ? (
+                    <div className="flex items-center gap-1.5 text-emerald-600 font-semibold animate-in fade-in duration-200">
+                      <CheckCircle className="w-3.5 h-3.5 shrink-0" />
+                      <span>Nội dung hợp lệ</span>
                     </div>
                   ) : (
                     <span />
