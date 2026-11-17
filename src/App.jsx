@@ -6,7 +6,6 @@ import CardModal from './components/CardModal';
 import AdminDashboard from './components/AdminDashboard';
 import LivePresentationView from './components/LivePresentationView';
 import { getWishes, isSupabaseConfigured, supabase } from './lib/supabase';
-import { GraduationCap, Heart } from 'lucide-react';
 
 export default function App() {
   const getRouteView = () => {
@@ -183,21 +182,6 @@ export default function App() {
           )}
         </main>
       </div>
-
-      {/* Footer ấm áp & trang nhã */}
-      <footer className="border-t border-slate-200/80 bg-white/80 backdrop-blur-xs py-7 text-center text-xs text-slate-500 relative">
-        <div className="max-w-4xl mx-auto px-4 flex flex-col items-center justify-center gap-2">
-          <div className="flex items-center justify-center gap-2 text-rose-700 font-bold text-sm md:text-base">
-            <Heart className="w-4 h-4 text-rose-600 fill-rose-600 animate-pulse" />
-            <span>Kính Chúc Quý Thầy Cô Ngày Nhà Giáo Việt Nam 20/11 Trọn Vẹn Niềm Vui!</span>
-          </div>
-          <div className="flex items-center justify-center gap-2 text-slate-400 text-xs">
-            <span>BTEC FPT Education</span>
-            <span>•</span>
-            <span>Tri ân Thầy Cô Ngày Nhà Giáo Việt Nam 20.11</span>
-          </div>
-        </div>
-      </footer>
 
       {/* Modal phóng to xem chi tiết / tải thiệp */}
       {selectedWishForModal && (
