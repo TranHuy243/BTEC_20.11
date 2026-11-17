@@ -138,35 +138,47 @@ export default function LivePresentationView({ wishes = [], onExit }) {
       )}
 
       {/* ===================== HEADER ===================== */}
-      <header className="relative z-30 px-8 md:px-14 py-6 flex items-center justify-between">
+      <header className="relative z-30 px-6 md:px-12 lg:px-14 pt-4 md:pt-6 pb-2 md:pb-4 flex items-center justify-between gap-4">
 
-        {/* Góc trái: Logo BTEC FPT từ trang web */}
-        <div className="flex items-center gap-3">
-          <div className="bg-white/95 px-4 py-2 rounded-2xl shadow-xl border border-white/20 flex items-center justify-center backdrop-blur-xs">
+        {/* Góc trái: Logo BTEC FPT & Logo Melbourne Polytechnic */}
+        <div className="flex items-center gap-2.5 md:gap-4">
+          <div className="bg-white/95 px-3 md:px-5 py-2 md:py-2.5 rounded-2xl md:rounded-3xl shadow-xl border border-white/30 flex items-center justify-center backdrop-blur-xs">
             <img
               src="/logo-btec.png"
               alt="BTEC FPT"
-              className="h-8 md:h-10 w-auto object-contain shrink-0"
+              className="h-9 md:h-13 lg:h-15 w-auto object-contain shrink-0"
+            />
+          </div>
+          <div className="bg-white/95 px-3 md:px-5 py-2 md:py-2.5 rounded-2xl md:rounded-3xl shadow-xl border border-white/30 flex items-center justify-center backdrop-blur-xs">
+            <img
+              src="/logo-melbourne.png"
+              alt="Melbourne Polytechnic"
+              className="h-9 md:h-13 lg:h-15 w-auto object-contain shrink-0"
             />
           </div>
         </div>
 
-        {/* Giữa: Tiêu đề trang trọng đúng visual 20/11 */}
+        {/* Giữa: Tiêu đề trang trọng đúng visual 20/11 - Tăng kích thước nổi bật trên TV */}
         <div className="text-center">
-          <p className="text-[11px] md:text-xs font-extrabold tracking-[0.25em] uppercase text-[#F59E0B]">
-            Nhà giáo Việt Nam 20.11          </p>
-          <h1 className="text-2xl md:text-4xl font-black tracking-tight mt-0.5 drop-shadow-md">
-            Lưu Bút Tri Ân           </h1>
+          <p className="text-xs md:text-sm lg:text-base font-extrabold tracking-[0.25em] uppercase text-[#F59E0B] drop-shadow-sm">
+            Nhà giáo Việt Nam 20.11
+          </p>
+          <h1 className="text-3xl md:text-5xl lg:text-6xl font-black tracking-tight mt-1 drop-shadow-lg">
+            Lưu Bút Tri Ân
+          </h1>
         </div>
 
-        {/* Góc phải: Logo Melbourne Polytechnic đối diện logo BTEC */}
-        <div className="flex items-center gap-3">
-          <div className="bg-white/95 px-4 py-2 rounded-2xl shadow-xl border border-white/20 flex items-center justify-center backdrop-blur-xs">
+        {/* Góc phải: Mã QR quét gửi lời chúc */}
+        <div className="flex items-center">
+          <div className="bg-white/95 p-2 md:p-2.5 rounded-2xl md:rounded-3xl shadow-2xl border border-white/30 flex flex-col items-center justify-center backdrop-blur-xs group">
             <img
-              src="/logo-melbourne.png"
-              alt="Melbourne Polytechnic"
-              className="h-8 md:h-10 w-auto object-contain shrink-0"
+              src="/qr-code.png"
+              alt="Quét QR để gửi lời chúc"
+              className="w-16 h-16 md:w-22 md:h-22 lg:w-26 lg:h-26 object-contain rounded-xl"
             />
+            <span className="text-[10px] md:text-xs font-bold text-slate-800 tracking-tight mt-1 text-center whitespace-nowrap">
+              Quét QR để gửi lời chúc 💌
+            </span>
           </div>
         </div>
 
