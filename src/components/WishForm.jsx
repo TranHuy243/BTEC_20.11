@@ -13,30 +13,21 @@ import { searchTeachers } from '../data/teachers';
 import { addWish } from '../lib/supabase';
 import confetti from 'canvas-confetti';
 
-// 3 mẫu bưu thiếp nguyên bản với hình ảnh minh họa và mô tả khớp theo ảnh mẫu
+// 3 mẫu bưu thiếp nguyên bản
 const TEMPLATE_CARDS = [
   {
     id: 'luxury_cream',
-    stepNumber: '01',
-    title: '01 · Nắng tháng Mười Một',
     name: 'Mẫu 1',
-    tag: 'Ấm áp, hoa lá',
     image: '/frames/frame_mau_1.jpg'
   },
   {
     id: 'collegiate_navy',
-    stepNumber: '02',
-    title: '02 · Thanh xuân BTEC',
     name: 'Mẫu 2',
-    tag: 'Trẻ trung, tươi sáng',
     image: '/frames/frame_mau_2.jpg'
   },
   {
     id: 'slate_chalk',
-    stepNumber: '03',
-    title: '03 · Điều muốn nói',
     name: 'Mẫu 3',
-    tag: 'Nhẹ nhàng, tinh tế',
     image: '/frames/frame_mau_3.jpg'
   }
 ];
@@ -214,12 +205,9 @@ export default function WishForm({ onWishSubmitted, onOpenZoomModal }) {
                   </div>
 
                   {/* Thanh thông tin dưới chân tấm thiệp */}
-                  <div className="p-4 flex items-center justify-between text-xs bg-white border-t border-slate-100">
-                    <span className={`font-bold ${isSelected ? 'text-orange-950' : 'text-slate-800'}`}>
-                      {frame.title}
-                    </span>
-                    <span className="text-slate-400 font-medium">
-                      {frame.tag}
+                  <div className="py-3 px-4 flex items-center justify-center text-sm bg-white border-t border-slate-100">
+                    <span className={`font-bold transition-colors ${isSelected ? 'text-orange-600 font-extrabold' : 'text-slate-800'}`}>
+                      {frame.name}
                     </span>
                   </div>
                 </div>
