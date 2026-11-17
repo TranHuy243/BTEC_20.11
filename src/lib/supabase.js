@@ -21,7 +21,7 @@ const LOCAL_STORAGE_MODERATORS_KEY = '20_11_moderators_backup';
 const DEFAULT_SAMPLE_WISHES = [
   {
     id: 'sample-1',
-    teacher_name: 'Thầy Nguyễn Văn An',
+    teacher_name: 'thầy Nguyễn Văn An',
     sender_name: 'Nguyễn Minh Tuấn (Lớp IT01)',
     is_anonymous: false,
     message: 'Nhân ngày 20/11, em xin kính chúc thầy luôn dồi dào sức khỏe, tràn đầy nhiệt huyết để tiếp tục dìu dắt bao thế hệ sinh viên cập bến tri thức. Cảm ơn thầy vì những bài giảng bổ ích và sự tận tụy khôn nguôi!',
@@ -31,7 +31,7 @@ const DEFAULT_SAMPLE_WISHES = [
   },
   {
     id: 'sample-2',
-    teacher_name: 'Cô Trần Thị Mai Phương',
+    teacher_name: 'cô Trần Thị Mai Phương',
     sender_name: 'Ẩn danh',
     is_anonymous: true,
     message: 'Kính chúc cô một ngày Nhà giáo Việt Nam thật nhiều niềm vui và hạnh phúc bên gia đình và học trò. Nụ cười và sự ân cần của cô là nguồn động lực rất lớn cho chúng em mỗi khi đến lớp!',
