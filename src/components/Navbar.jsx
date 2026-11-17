@@ -7,19 +7,24 @@ export default function Navbar({ activeTab, setActiveTab, wishCount }) {
       {/* Khung thanh Navbar dạng một dải Pill tròn nổi (Floating Island Pill) duy nhất */}
       <div className="w-full bg-white/90 backdrop-blur-md rounded-full border border-slate-200/80 shadow-md shadow-slate-900/5 px-3.5 md:px-6 py-2 md:py-2.5 flex items-center justify-between gap-3">
 
-        {/* Khối bên trái: Logo BTEC FPT & Tiêu đề Tri Ân */}
-        <div className="flex items-center gap-2.5 md:gap-3">
+        {/* Khối bên trái: Logo BTEC FPT & Melbourne Polytechnic & Tiêu đề Tri Ân */}
+        <div className="flex items-center gap-2 sm:gap-2.5 md:gap-3">
           <img
             src="/logo-btec.png"
             alt="BTEC FPT Education"
-            className="h-8 md:h-9 w-auto object-contain shrink-0"
+            className="h-7 sm:h-8 md:h-9 w-auto object-contain shrink-0"
           />
-          <div className="h-5 w-[1px] bg-slate-200 hidden sm:block" />
-          <div className="hidden sm:flex items-center gap-2">
+          <div className="h-4 sm:h-5 w-[1px] bg-slate-200" />
+          <img
+            src="/logo-melbourne.png"
+            alt="Melbourne Polytechnic"
+            className="h-6 sm:h-7 md:h-8 w-auto object-contain shrink-0"
+          />
+          <div className="h-5 w-[1px] bg-slate-200 hidden md:block" />
+          <div className="hidden md:flex items-center gap-2">
             <span className="font-extrabold text-sm md:text-base text-slate-800 tracking-tight">
               Tri Ân Thầy Cô
             </span>
-
           </div>
         </div>
 

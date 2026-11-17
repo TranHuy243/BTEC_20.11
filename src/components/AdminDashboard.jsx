@@ -869,9 +869,15 @@ export default function AdminDashboard({ wishes, onRefreshWishes, onBackToSite, 
                     <p className="text-sm md:text-lg font-extrabold tracking-tight">Những Lời Tri Ân</p>
                   </div>
 
-                  {/* Nút phóng to thu nhỏ góc phải (không hiển thị số giây) */}
-                  <div className="p-1 rounded-lg text-white/50 hover:text-white">
-                    <Maximize2 className="w-4 h-4" />
+                  {/* Logo Melbourne Polytechnic góc phải đối diện BTEC */}
+                  <div className="flex items-center gap-2">
+                    <div className="bg-white px-2.5 py-1 rounded-xl shadow-xs flex items-center justify-center">
+                      <img
+                        src="/logo-melbourne.png"
+                        alt="Melbourne Polytechnic"
+                        className="h-6 w-auto object-contain shrink-0"
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -896,8 +902,14 @@ export default function AdminDashboard({ wishes, onRefreshWishes, onBackToSite, 
                 </div>
 
                 {/* Footer Preview */}
-                <div className="flex items-center justify-end text-[10px] text-white/50 relative z-10">
-                  <div>{wishes.length} lời tri ân</div>
+                <div className="flex items-center justify-between text-[10px] text-white/50 relative z-10">
+                  <div />
+                  <div className="flex items-center gap-2">
+                    <div>{wishes.length} lời tri ân</div>
+                    <div className="p-1 rounded bg-white/10 text-white/70">
+                      <Maximize2 className="w-3 h-3" />
+                    </div>
+                  </div>
                 </div>
 
                 {/* Hover overlay hint */}

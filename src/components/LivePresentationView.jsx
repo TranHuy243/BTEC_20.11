@@ -158,15 +158,15 @@ export default function LivePresentationView({ wishes = [], onExit }) {
             Lưu Bút Tri Ân           </h1>
         </div>
 
-        {/* Góc phải: Nút phóng to / thu nhỏ qua lại */}
-        <div className="flex items-center">
-          <button
-            onClick={toggleFullscreen}
-            className="p-2.5 rounded-2xl bg-white/10 hover:bg-white/20 text-white/70 hover:text-white border border-white/15 transition cursor-pointer shadow-sm"
-            title={isFullscreen ? 'Thu nhỏ màn hình (Phím F hoặc Esc)' : 'Phóng to toàn màn hình (Phím F)'}
-          >
-            {isFullscreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
-          </button>
+        {/* Góc phải: Logo Melbourne Polytechnic đối diện logo BTEC */}
+        <div className="flex items-center gap-3">
+          <div className="bg-white/95 px-4 py-2 rounded-2xl shadow-xl border border-white/20 flex items-center justify-center backdrop-blur-xs">
+            <img
+              src="/logo-melbourne.png"
+              alt="Melbourne Polytechnic"
+              className="h-8 md:h-10 w-auto object-contain shrink-0"
+            />
+          </div>
         </div>
 
       </header>
@@ -204,9 +204,21 @@ export default function LivePresentationView({ wishes = [], onExit }) {
       </main>
 
       {/* ===================== FOOTER ===================== */}
-      <footer className="relative z-30 px-8 md:px-14 py-5 flex items-center justify-end text-xs text-white/60">
-        <div className="font-bold text-white/80">
-          {wishes.length} lời tri ân
+      <footer className="relative z-30 px-8 md:px-14 py-4 flex items-center justify-between text-xs text-white/60">
+        <div />
+        
+        {/* Nút toàn màn hình chuyển xuống dưới bên cạnh X lời tri ân */}
+        <div className="flex items-center gap-3">
+          <span className="font-bold text-white/80">
+            {wishes.length} lời tri ân
+          </span>
+          <button
+            onClick={toggleFullscreen}
+            className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white/70 hover:text-white border border-white/15 transition cursor-pointer shadow-sm flex items-center justify-center"
+            title={isFullscreen ? 'Thu nhỏ màn hình (Phím F hoặc Esc)' : 'Phóng to toàn màn hình (Phím F)'}
+          >
+            {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+          </button>
         </div>
       </footer>
 
