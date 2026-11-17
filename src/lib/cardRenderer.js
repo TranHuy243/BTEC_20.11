@@ -139,7 +139,7 @@ function loadFrame4Image() {
     img.onerror = () => {
       resolve(null);
     };
-    img.src = '/frames/frame_mau_4.jpg?v=5';
+    img.src = '/frames/frame_mau_4.jpg?v=6';
   });
 }
 
@@ -524,23 +524,23 @@ function drawTemplate3Content(ctx, data) {
 }
 
 /**
- * Vẽ chữ khớp chính xác vào các dòng kẻ chấm của MẪU 4 (Bưu thiếp Quốc tế - UK & Australia)
+ * Vẽ chữ khớp chính xác vào các vị trí của MẪU 4 (Bưu thiếp Quốc tế - To / Message / From)
  * Tự động dịch sang trái nếu tên người gửi dài để không đè và không tràn viền.
  */
 function drawTemplate4Content(ctx, data) {
   ctx.save();
 
-  // 1. Tên Thầy/Cô (Nằm trên dòng chấm sau chữ "Gửi đến:")
+  // 1. Tên Thầy/Cô (Nằm trên dòng kẻ sau chữ "To:")
   let teacherFontSize = 26;
   ctx.textAlign = 'left';
   ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
   ctx.fillStyle = '#0F2942'; // Xanh navy đậm phong cách bưu chính quốc tế
   const teacher = data.teacher_name ? data.teacher_name.trim() : 'thầy/cô kính mến';
-  while (ctx.measureText(teacher).width > 400 && teacherFontSize > 13) {
+  while (ctx.measureText(teacher).width > 480 && teacherFontSize > 13) {
     teacherFontSize--;
     ctx.font = `bold ${teacherFontSize}px "Times New Roman", Georgia, serif`;
   }
-  ctx.fillText(teacher, 140, 117);
+  ctx.fillText(teacher, 76, 117);
 
   // 2. Nội dung lời chúc (Đồng nhất cỡ chữ 26px, cùng màu xanh navy #0F2942 với người gửi & gửi đến)
   ctx.fillStyle = '#0F2942';
@@ -550,18 +550,18 @@ function drawTemplate4Content(ctx, data) {
   const defaultMsg = 'Nhân ngày 20/11, em xin kính chúc Thầy/Cô luôn dồi dào sức khỏe, ngập tràn niềm vui và luôn giữ trọn nhiệt huyết trong từng giờ lên lớp!';
   const rawText = data.message ? data.message.trim() : defaultMsg;
 
-  const dottedY = [201, 239, 277, 315];
-  const maxW = 595;
+  const wishY = [205, 245, 285, 325, 365];
+  const maxW = 640;
 
   let lines = wrapText(ctx, rawText, maxW);
-  while (lines.length > dottedY.length && wishFontSize > 15) {
+  while (lines.length > wishY.length && wishFontSize > 15) {
     wishFontSize--;
     ctx.font = `italic ${wishFontSize}px "Times New Roman", Georgia, serif`;
     lines = wrapText(ctx, rawText, maxW);
   }
 
-  for (let i = 0; i < Math.min(lines.length, dottedY.length); i++) {
-    ctx.fillText(lines[i], 35, dottedY[i]);
+  for (let i = 0; i < Math.min(lines.length, wishY.length); i++) {
+    ctx.fillText(lines[i], 32, wishY[i]);
   }
 
   // 3. Người gửi: Tự động dịch chuyển sang trái nếu tên dài để không bị đè và không tràn viền
@@ -573,38 +573,42 @@ function drawTemplate4Content(ctx, data) {
     : (data.sender_name && data.sender_name.trim() ? data.sender_name.trim() : 'Học trò BTEC FPT');
 
   const senderW = ctx.measureText(sender).width;
-  const rightBound = 990;
+  const rightBound = 995;
 
-  if (senderW <= 185) {
-    // Tên ngắn vừa vặn với dòng chấm có sẵn bên phải
-    ctx.fillText(sender, 804, 387);
+  if (senderW <= 205) {
+    // Tên ngắn vừa vặn với dòng kẻ có sẵn bên phải
+    ctx.fillText(sender, 788, 387);
   } else {
-    // Tên dài: dịch cả cụm "Người gửi:" sang trái để có đủ khoảng trống, không tràn viền
-    ctx.font = CARD_LABEL_FONT;
-    const labelW = ctx.measureText('Người gửi:').width;
-    const totalW = labelW + 12 + senderW;
+    // Tên dài: dịch cả cụm "From:" sang trái để có đủ khoảng trống, không tràn viền
+    const fromW = 75;
+    const totalW = fromW + 10 + senderW;
     let labelX = rightBound - totalW;
     if (labelX < 380) {
       labelX = 380;
       // Thu nhỏ cỡ chữ người gửi nếu tên cực dài
-      while (ctx.measureText(sender).width > (rightBound - (labelX + labelW + 12)) && senderFontSize > 13) {
+      while (ctx.measureText(sender).width > (rightBound - (labelX + fromW + 10)) && senderFontSize > 13) {
         senderFontSize--;
         ctx.font = `bold ${senderFontSize}px "Times New Roman", Georgia, serif`;
       }
     }
-    const nameX = labelX + labelW + 12;
+    const nameX = labelX + fromW + 10;
 
-    // Phủ nền kem che phần Người gửi cũ đã in sẵn
+    // Phủ nền kem che phần From cũ đã in sẵn
     ctx.fillStyle = '#FDF3E9';
-    ctx.fillRect(labelX - 8, 366, 1000 - (labelX - 8), 38);
+    ctx.fillRect(labelX - 6, 366, 1005 - (labelX - 6), 36);
 
-    // Vẽ lại nhãn Người gửi: tại vị trí đã dịch
+    // Vẽ lại nhãn From: tại vị trí đã dịch
     ctx.fillStyle = '#0F2942';
-    ctx.font = CARD_LABEL_FONT;
-    ctx.fillText('Người gửi:', labelX, 387);
+    ctx.font = 'bold 24px "Times New Roman", Georgia, serif';
+    ctx.fillText('From:', labelX, 387);
 
-    // Vẽ dòng chấm nối tiếp tới mép phải
-    drawCardDottedLine(ctx, nameX - 2, 390, rightBound, '#788896');
+    // Vẽ dòng kẻ liền nối tiếp tới mép phải
+    ctx.strokeStyle = '#0F2942';
+    ctx.lineWidth = 1.8;
+    ctx.beginPath();
+    ctx.moveTo(nameX - 2, 389);
+    ctx.lineTo(rightBound, 389);
+    ctx.stroke();
 
     // Vẽ tên người gửi
     ctx.font = `bold ${senderFontSize}px "Times New Roman", Georgia, serif`;

@@ -33,7 +33,7 @@ const TEMPLATE_CARDS = [
   {
     id: 'international_uk_au',
     name: 'Mẫu 4',
-    image: '/frames/frame_mau_4.jpg?v=5'
+    image: '/frames/frame_mau_4.jpg?v=6'
   },
   {
     id: 'airmail_global',
