@@ -1,11 +1,20 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { 
   ShieldCheck, ShieldAlert, Trash2, Search, Eye, 
   ArrowLeft, LogOut, Key, UserPlus, Users, Download, 
   Sparkles, CheckCircle2, AlertTriangle, FileSpreadsheet, Lock, Tv,
   ExternalLink, Play, MonitorPlay, Sliders, Maximize2
 } from 'lucide-react';
-import { deleteWish, getModerators, addModerator, deleteModerator } from '../lib/supabase';
+import {
+  deleteWish,
+  getModerators,
+  addModerator,
+  deleteModerator,
+  getLocalPresentationSettings,
+  getPresentationSettings,
+  savePresentationSettings,
+  subscribePresentationSettings
+} from '../lib/supabase';
 import { checkProfanity } from '../lib/profanityFilter';
 import CardModal from './CardModal';
 import { ProjectorCardCanvas } from './LivePresentationView';
@@ -22,28 +31,70 @@ export default function AdminDashboard({ wishes, onRefreshWishes, onBackToSite, 
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('ALL'); // 'ALL' | 'ANONYMOUS' | 'NAMED' | 'SUSPICIOUS'
 
-  // Cấu hình tốc độ trôi thiệp & theme trình chiếu TV (lưu trong localStorage)
-  const [marqueeSpeed, setMarqueeSpeed] = useState(() => {
-    const val = parseInt(localStorage.getItem('btec_presentation_marquee_speed') || '60', 10);
-    return isNaN(val) || val <= 0 ? 60 : val;
-  });
+  // Cấu hình tốc độ trôi thiệp & theme trình chiếu TV (đồng bộ Realtime lên Supabase cho TẤT CẢ các TV)
+  const initialTvSettings = getLocalPresentationSettings();
+  const [marqueeSpeed, setMarqueeSpeed] = useState(initialTvSettings.marqueeSpeed);
+  const [presentationTheme, setPresentationTheme] = useState(initialTvSettings.theme);
+  const [syncStatus, setSyncStatus] = useState('idle'); // 'idle' | 'syncing' | 'synced'
+  const syncTimerRef = useRef(null);
+  const statusClearRef = useRef(null);
 
-  const [presentationTheme, setPresentationTheme] = useState(() => {
-    return localStorage.getItem('btec_presentation_theme') || 'forest_kv';
-  });
+  const pushPresentationSettings = (nextSpeed, nextTheme, debounceMs = 0) => {
+    if (syncTimerRef.current) clearTimeout(syncTimerRef.current);
+    if (statusClearRef.current) clearTimeout(statusClearRef.current);
+    setSyncStatus('syncing');
 
-  const handleSetMarqueeSpeed = (sec) => {
+    const run = async () => {
+      await savePresentationSettings({
+        marqueeSpeed: nextSpeed,
+        theme: nextTheme
+      });
+      setSyncStatus('synced');
+      statusClearRef.current = setTimeout(() => {
+        setSyncStatus('idle');
+      }, 2500);
+    };
+
+    if (debounceMs > 0) {
+      syncTimerRef.current = setTimeout(run, debounceMs);
+    } else {
+      run();
+    }
+  };
+
+  const handleSetMarqueeSpeed = (sec, debounceMs = 0) => {
     const num = Math.max(10, Math.min(180, Number(sec) || 60));
     setMarqueeSpeed(num);
-    localStorage.setItem('btec_presentation_marquee_speed', String(num));
-    window.dispatchEvent(new Event('storage'));
+    pushPresentationSettings(num, presentationTheme, debounceMs);
   };
 
   const handleSetTheme = (themeId) => {
     setPresentationTheme(themeId);
-    localStorage.setItem('btec_presentation_theme', themeId);
-    window.dispatchEvent(new Event('storage'));
+    pushPresentationSettings(marqueeSpeed, themeId, 0);
   };
+
+  // Tải cấu hình trình chiếu TV đang chạy từ Supabase & giữ đồng bộ giữa nhiều máy Admin
+  useEffect(() => {
+    let isMounted = true;
+    getPresentationSettings().then((res) => {
+      if (!isMounted || !res?.data) return;
+      setMarqueeSpeed(res.data.marqueeSpeed);
+      setPresentationTheme(res.data.theme);
+    });
+
+    const unsubscribe = subscribePresentationSettings((settings) => {
+      if (!isMounted || !settings) return;
+      setMarqueeSpeed(settings.marqueeSpeed);
+      setPresentationTheme(settings.theme);
+    });
+
+    return () => {
+      isMounted = false;
+      unsubscribe();
+      if (syncTimerRef.current) clearTimeout(syncTimerRef.current);
+      if (statusClearRef.current) clearTimeout(statusClearRef.current);
+    };
+  }, []);
   
   const [moderators, setModerators] = useState([]);
   const [newModName, setNewModName] = useState('');
@@ -730,9 +781,22 @@ export default function AdminDashboard({ wishes, onRefreshWishes, onBackToSite, 
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 self-start sm:self-auto bg-slate-100 px-3.5 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700">
-                  <span>Tốc độ hiện tại:</span>
-                  <span className="text-emerald-700 font-extrabold text-sm">{marqueeSpeed} giây</span>
+                <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+                  {syncStatus === 'syncing' && (
+                    <span className="px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold">
+                      Đang đồng bộ tới tất cả TV...
+                    </span>
+                  )}
+                  {syncStatus === 'synced' && (
+                    <span className="px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-1">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                      Đã đồng bộ tất cả TV
+                    </span>
+                  )}
+                  <div className="flex items-center gap-2 bg-slate-100 px-3.5 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700">
+                    <span>Tốc độ hiện tại:</span>
+                    <span className="text-emerald-700 font-extrabold text-sm">{marqueeSpeed} giây</span>
+                  </div>
                 </div>
               </div>
 
@@ -748,7 +812,7 @@ export default function AdminDashboard({ wishes, onRefreshWishes, onBackToSite, 
                 ].map(({ sec, label }) => (
                   <button
                     key={sec}
-                    onClick={() => handleSetMarqueeSpeed(sec)}
+                    onClick={() => handleSetMarqueeSpeed(sec, 0)}
                     className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                       marqueeSpeed === sec
                         ? 'bg-emerald-800 text-white shadow-md'
@@ -769,7 +833,7 @@ export default function AdminDashboard({ wishes, onRefreshWishes, onBackToSite, 
                   max="120"
                   step="5"
                   value={marqueeSpeed}
-                  onChange={(e) => handleSetMarqueeSpeed(e.target.value)}
+                  onChange={(e) => handleSetMarqueeSpeed(e.target.value, 200)}
                   className="w-full accent-emerald-700 cursor-pointer"
                 />
                 <div className="flex items-center gap-2 shrink-0">
@@ -779,7 +843,7 @@ export default function AdminDashboard({ wishes, onRefreshWishes, onBackToSite, 
                     min="10"
                     max="180"
                     value={marqueeSpeed}
-                    onChange={(e) => handleSetMarqueeSpeed(e.target.value)}
+                    onChange={(e) => handleSetMarqueeSpeed(e.target.value, 300)}
                     className="w-16 px-2.5 py-1.5 rounded-xl border border-slate-300 text-xs font-bold text-center focus:border-emerald-600 outline-none bg-white"
                   />
                   <span className="text-xs text-slate-500 font-medium">giây</span>
@@ -811,7 +875,7 @@ export default function AdminDashboard({ wishes, onRefreshWishes, onBackToSite, 
               <div className="p-3 bg-emerald-50/80 rounded-2xl border border-emerald-200/80 text-xs text-emerald-900 flex items-center gap-2">
                 <span>💡</span>
                 <span>
-                  <b>Tự động đồng bộ:</b> Bất kỳ thay đổi tốc độ hoặc màu nền nào tại đây đều được gửi trực tiếp sang màn hình chiếu TV ngay lập tức mà không cần bấm tải lại trang!
+                  <b>Đồng bộ đa TV qua đám mây (Realtime):</b> Mọi thay đổi tốc độ hoặc màu nền tại đây sẽ tự động cập nhật ngay lập tức trên <b>TẤT CẢ các TV / màn hình chiếu</b> đang mở (kể cả TV ở thiết bị khác), và TV bật lên sau cũng tự nhận đúng cấu hình này!
                 </span>
               </div>
             </div>

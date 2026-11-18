@@ -1,17 +1,11 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Maximize2, Minimize2, Sparkles } from 'lucide-react';
 import { renderCardOnCanvas } from '../lib/cardRenderer';
-
-const DEFAULT_MARQUEE_SPEED = 60; // 60 giây cho 1 vòng trôi đầy đủ
-
-const getSavedSpeed = () => {
-  const val = parseInt(localStorage.getItem('btec_presentation_marquee_speed') || '60', 10);
-  return isNaN(val) || val <= 0 ? DEFAULT_MARQUEE_SPEED : val;
-};
-
-const getSavedTheme = () => {
-  return localStorage.getItem('btec_presentation_theme') || 'forest_kv';
-};
+import {
+  getLocalPresentationSettings,
+  getPresentationSettings,
+  subscribePresentationSettings
+} from '../lib/supabase';
 
 export function ProjectorCardCanvas({ wish }) {
   const canvasRef = useRef(null);
@@ -29,31 +23,40 @@ export function ProjectorCardCanvas({ wish }) {
   return (
     <canvas
       ref={canvasRef}
-      className="w-full h-auto aspect-[1024/571] object-contain rounded-2xl md:rounded-3xl shadow-2xl bg-[#FFFDF7]"
+      className="w-full h-auto aspect-video object-contain rounded-2xl md:rounded-3xl shadow-2xl bg-[#FFFDF7]"
     />
   );
 }
 
 export default function LivePresentationView({ wishes = [], onExit }) {
-  const [scrollSpeed, setScrollSpeed] = useState(getSavedSpeed);
-  const [theme, setTheme] = useState(getSavedTheme);
+  const initialSettings = getLocalPresentationSettings();
+  const [scrollSpeed, setScrollSpeed] = useState(initialSettings.marqueeSpeed);
+  const [theme, setTheme] = useState(initialSettings.theme);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [selectedWishForDetail, setSelectedWishForDetail] = useState(null);
 
   const containerRef = useRef(null);
 
-  // Lắng nghe khi cài đặt tốc độ hoặc theme thay đổi từ Admin
+  // Đồng bộ tốc độ & tông nền từ Admin qua Supabase Realtime (tự nhận ngay cả khi mở trên TV khác)
   useEffect(() => {
-    const handleStorageChange = (e) => {
-      if (!e || e.key === 'btec_presentation_marquee_speed') {
-        setScrollSpeed(getSavedSpeed());
-      }
-      if (!e || e.key === 'btec_presentation_theme') {
-        setTheme(getSavedTheme());
-      }
+    let isMounted = true;
+
+    getPresentationSettings().then((res) => {
+      if (!isMounted || !res?.data) return;
+      setScrollSpeed(res.data.marqueeSpeed);
+      setTheme(res.data.theme);
+    });
+
+    const unsubscribe = subscribePresentationSettings((settings) => {
+      if (!isMounted || !settings) return;
+      setScrollSpeed(settings.marqueeSpeed);
+      setTheme(settings.theme);
+    });
+
+    return () => {
+      isMounted = false;
+      unsubscribe();
     };
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   // Phím tắt điều khiển: F toàn màn hình, Esc đóng phóng to
@@ -204,7 +207,7 @@ export default function LivePresentationView({ wishes = [], onExit }) {
                 <div
                   key={`${wish.id}-${index}`}
                   onClick={() => setSelectedWishForDetail(wish)}
-                  className="w-[660px] sm:w-[740px] md:w-[820px] lg:w-[900px] xl:w-[960px] aspect-[1024/571] shrink-0 rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl shadow-black/50 border border-white/20 transition-all duration-300 hover:scale-[1.03] hover:shadow-amber-500/20 cursor-pointer"
+                  className="w-[660px] sm:w-[740px] md:w-[820px] lg:w-[900px] xl:w-[960px] aspect-video shrink-0 rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl shadow-black/50 border border-white/20 transition-all duration-300 hover:scale-[1.03] hover:shadow-amber-500/20 cursor-pointer"
                   title="Chạm vào thiệp để đọc đầy đủ"
                 >
                   <ProjectorCardCanvas wish={wish} />
