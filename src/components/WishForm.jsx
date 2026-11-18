@@ -18,32 +18,32 @@ const TEMPLATE_CARDS = [
   {
     id: 'luxury_cream',
     name: 'Mẫu 1',
-    image: '/frames/frame_mau_1.jpg?v=5'
+    image: '/frames/frame_mau_1.png?v=7'
   },
   {
     id: 'collegiate_navy',
     name: 'Mẫu 2',
-    image: '/frames/frame_mau_2.jpg?v=5'
+    image: '/frames/frame_mau_2.png?v=7'
   },
   {
     id: 'slate_chalk',
     name: 'Mẫu 3',
-    image: '/frames/frame_mau_3.jpg?v=5'
+    image: '/frames/frame_mau_3.png?v=7'
   },
   {
     id: 'international_uk_au',
     name: 'Mẫu 4',
-    image: '/frames/frame_mau_4.jpg?v=6'
+    image: '/frames/frame_mau_4.png?v=7'
   },
   {
     id: 'airmail_global',
     name: 'Mẫu 5',
-    image: '/frames/frame_mau_5.jpg?v=5'
+    image: '/frames/frame_mau_5.png?v=7'
   },
   {
     id: 'vintage_journey',
     name: 'Mẫu 6',
-    image: '/frames/frame_mau_6.jpg?v=5'
+    image: '/frames/frame_mau_6.png?v=7'
   }
 ];
 

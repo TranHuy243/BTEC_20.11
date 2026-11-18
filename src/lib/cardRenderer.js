@@ -85,7 +85,7 @@ function loadFrame1Image() {
     img.onerror = () => {
       resolve(null);
     };
-    img.src = '/frames/frame_mau_1.jpg?v=5';
+    img.src = '/frames/frame_mau_1.png?v=7';
   });
 }
 
@@ -103,7 +103,7 @@ function loadFrame2Image() {
     img.onerror = () => {
       resolve(null);
     };
-    img.src = '/frames/frame_mau_2.jpg?v=5';
+    img.src = '/frames/frame_mau_2.png?v=7';
   });
 }
 
@@ -121,7 +121,7 @@ function loadFrame3Image() {
     img.onerror = () => {
       resolve(null);
     };
-    img.src = '/frames/frame_mau_3.jpg?v=5';
+    img.src = '/frames/frame_mau_3.png?v=7';
   });
 }
 
@@ -139,7 +139,7 @@ function loadFrame4Image() {
     img.onerror = () => {
       resolve(null);
     };
-    img.src = '/frames/frame_mau_4.jpg?v=6';
+    img.src = '/frames/frame_mau_4.png?v=7';
   });
 }
 
@@ -157,7 +157,7 @@ function loadFrame5Image() {
     img.onerror = () => {
       resolve(null);
     };
-    img.src = '/frames/frame_mau_5.jpg?v=5';
+    img.src = '/frames/frame_mau_5.png?v=7';
   });
 }
 
@@ -175,7 +175,7 @@ function loadFrame6Image() {
     img.onerror = () => {
       resolve(null);
     };
-    img.src = '/frames/frame_mau_6.jpg?v=5';
+    img.src = '/frames/frame_mau_6.png?v=7';
   });
 }
 
