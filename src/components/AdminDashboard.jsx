@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { 
   ShieldCheck, ShieldAlert, Trash2, Search, Eye, 
-  ArrowLeft, LogOut, Key, UserPlus, Users, Download, 
-  Sparkles, CheckCircle2, AlertTriangle, FileSpreadsheet, Lock, Tv,
-  ExternalLink, Play, MonitorPlay, Sliders, Maximize2
+  ArrowLeft, LogOut, Key, UserPlus, Users, 
+  Sparkles, CheckCircle2, FileSpreadsheet, Lock, Tv,
+  ExternalLink, Play, Sliders, Maximize2,
+  Activity, Smartphone, Monitor, RefreshCw, BarChart3, Globe, TrendingUp
 } from 'lucide-react';
 import {
   deleteWish,
@@ -13,7 +14,8 @@ import {
   getLocalPresentationSettings,
   getPresentationSettings,
   savePresentationSettings,
-  subscribePresentationSettings
+  subscribePresentationSettings,
+  getVisitorStats
 } from '../lib/supabase';
 import { checkProfanity } from '../lib/profanityFilter';
 import CardModal from './CardModal';
@@ -22,14 +24,43 @@ import { ProjectorCardCanvas } from './LivePresentationView';
 // Mã PIN quản trị tối cao (Master Admin PIN)
 const MASTER_ADMIN_PIN = '20112026';
 
-export default function AdminDashboard({ wishes, onRefreshWishes, onBackToSite, onOpenLivePresentation }) {
+export default function AdminDashboard({ wishes, onlineCount = 1, onRefreshWishes, onBackToSite, onOpenLivePresentation }) {
   const [currentUser, setCurrentUser] = useState(null); // { role: 'admin' | 'moderator', name: string }
   const [pinInput, setPinInput] = useState('');
   const [loginError, setLoginError] = useState('');
   
-  const [activeTab, setActiveTab] = useState('wishes'); // 'wishes' | 'presentation' | 'moderators'
+  const [activeTab, setActiveTab] = useState('wishes'); // 'wishes' | 'presentation' | 'analytics' | 'moderators'
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('ALL'); // 'ALL' | 'ANONYMOUS' | 'NAMED' | 'SUSPICIOUS'
+
+  // Thống kê lượng khách truy cập (Site Visits & Analytics)
+  const [visitorStats, setVisitorStats] = useState({
+    totalVisits: 0,
+    uniqueVisitors: 0,
+    todayVisits: 0,
+    mobileVisits: 0,
+    desktopVisits: 0,
+    recentVisits: []
+  });
+  const [isLoadingStats, setIsLoadingStats] = useState(false);
+
+  const loadVisitorStatsData = async () => {
+    setIsLoadingStats(true);
+    try {
+      const res = await getVisitorStats();
+      if (res?.data) {
+        setVisitorStats(res.data);
+      }
+    } finally {
+      setIsLoadingStats(false);
+    }
+  };
+
+  useEffect(() => {
+    loadVisitorStatsData();
+    const interval = setInterval(loadVisitorStatsData, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Cấu hình tốc độ trôi thiệp & theme trình chiếu TV (đồng bộ Realtime lên Supabase cho TẤT CẢ các TV)
   const initialTvSettings = getLocalPresentationSettings();
@@ -373,30 +404,142 @@ export default function AdminDashboard({ wishes, onRefreshWishes, onBackToSite, 
       {/* Nội dung Dashboard */}
       <main className="max-w-7xl mx-auto px-4 md:px-8 py-6 w-full flex-1 space-y-6">
         
-        {/* Thống kê nhanh */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
-            <p className="text-xs text-slate-500 font-medium">Tổng lời chúc</p>
-            <p className="text-2xl font-black text-slate-900 mt-1">{wishes.length}</p>
+        {/* ===================== KHU VỰC THỐNG KÊ TỔNG QUAN ===================== */}
+        <div className="space-y-4">
+          
+          {/* HÀNG 1: THỐNG KÊ LƯU LƯỢNG TRUY CẬP WEBSITE */}
+          <div>
+            <div className="flex items-center justify-between mb-2 px-1">
+              <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                <Globe className="w-3.5 h-3.5 text-teal-600" />
+                <span>Lưu Lượng & Người Truy Cập Website</span>
+              </span>
+              <button
+                onClick={loadVisitorStatsData}
+                disabled={isLoadingStats}
+                className="text-[11px] font-semibold text-teal-700 hover:text-teal-900 flex items-center gap-1 cursor-pointer transition disabled:opacity-50"
+                title="Làm mới số liệu truy cập"
+              >
+                <RefreshCw className={`w-3 h-3 ${isLoadingStats ? 'animate-spin' : ''}`} />
+                <span>{isLoadingStats ? 'Đang cập nhật...' : 'Cập nhật số liệu'}</span>
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+              {/* Card 1: Realtime Online */}
+              <div className="bg-gradient-to-br from-emerald-50/70 via-white to-teal-50/40 p-4 rounded-2xl border border-emerald-200/80 shadow-xs relative overflow-hidden">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-emerald-900 font-bold flex items-center gap-1.5">
+                    <span className="relative flex h-2.5 w-2.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                    </span>
+                    Đang Trực Tuyến
+                  </span>
+                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-emerald-100 text-emerald-800">
+                    Realtime
+                  </span>
+                </div>
+                <p className="text-2xl font-black text-emerald-700 mt-1.5">
+                  {onlineCount} <span className="text-xs font-semibold text-emerald-600">thiết bị</span>
+                </p>
+                <p className="text-[11px] text-slate-500 mt-0.5">Đang bật web / TV ngay lúc này</p>
+              </div>
+
+              {/* Card 2: Unique Visitors */}
+              <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-slate-600 font-bold flex items-center gap-1.5">
+                    <Users className="w-3.5 h-3.5 text-indigo-600" />
+                    Người Truy Cập (Unique)
+                  </span>
+                  <span className="text-[10px] font-semibold text-slate-400">Khách riêng biệt</span>
+                </div>
+                <p className="text-2xl font-black text-indigo-700 mt-1.5">
+                  {visitorStats.uniqueVisitors}
+                </p>
+                <p className="text-[11px] text-slate-500 mt-0.5">Số thiết bị/trình duyệt đã vào</p>
+              </div>
+
+              {/* Card 3: Total Pageviews */}
+              <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-slate-600 font-bold flex items-center gap-1.5">
+                    <Eye className="w-3.5 h-3.5 text-teal-600" />
+                    Tổng Lượt Xem (Views)
+                  </span>
+                  <span className="text-[10px] font-semibold text-slate-400">Lượt tải trang</span>
+                </div>
+                <p className="text-2xl font-black text-teal-700 mt-1.5">
+                  {visitorStats.totalVisits}
+                </p>
+                <p className="text-[11px] text-slate-500 mt-0.5">Tổng số lượt mở & xem web</p>
+              </div>
+
+              {/* Card 4: Today & Devices */}
+              <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-slate-600 font-bold flex items-center gap-1.5">
+                    <Activity className="w-3.5 h-3.5 text-blue-600" />
+                    Hôm Nay / Thiết Bị
+                  </span>
+                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-blue-50 text-blue-700">
+                    Hôm nay: {visitorStats.todayVisits}
+                  </span>
+                </div>
+                <div className="flex items-center gap-3 mt-1.5">
+                  <p className="text-sm font-extrabold text-slate-800 flex items-center gap-1">
+                    <Smartphone className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>{visitorStats.mobileVisits}</span>
+                  </p>
+                  <span className="text-slate-300">|</span>
+                  <p className="text-sm font-extrabold text-slate-800 flex items-center gap-1">
+                    <Monitor className="w-3.5 h-3.5 text-indigo-600" />
+                    <span>{visitorStats.desktopVisits}</span>
+                  </p>
+                </div>
+                <p className="text-[11px] text-slate-500 mt-0.5">
+                  {visitorStats.totalVisits > 0
+                    ? `${Math.round((visitorStats.mobileVisits / visitorStats.totalVisits) * 100)}% Di động • ${Math.round((visitorStats.desktopVisits / visitorStats.totalVisits) * 100)}% Máy tính`
+                    : '100% Máy tính'}
+                </p>
+              </div>
+            </div>
           </div>
-          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
-            <p className="text-xs text-slate-500 font-medium">Có ghi họ tên</p>
-            <p className="text-2xl font-black text-emerald-600 mt-1">
-              {wishes.filter((w) => !w.is_anonymous).length}
-            </p>
+
+          {/* HÀNG 2: THỐNG KÊ LỜI CHÚC TRI ÂN */}
+          <div className="pt-1">
+            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-500 flex items-center gap-1.5 mb-2 px-1">
+              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+              <span>Nội Dung Tri Ân Thầy Cô</span>
+            </span>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
+              <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+                <p className="text-xs text-slate-500 font-medium">Tổng lời chúc</p>
+                <p className="text-2xl font-black text-slate-900 mt-1">{wishes.length}</p>
+              </div>
+              <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+                <p className="text-xs text-slate-500 font-medium">Có ghi họ tên</p>
+                <p className="text-2xl font-black text-emerald-600 mt-1">
+                  {wishes.filter((w) => !w.is_anonymous).length}
+                </p>
+              </div>
+              <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+                <p className="text-xs text-slate-500 font-medium">Gửi ẩn danh</p>
+                <p className="text-2xl font-black text-amber-600 mt-1">
+                  {wishes.filter((w) => w.is_anonymous).length}
+                </p>
+              </div>
+              <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+                <p className="text-xs text-slate-500 font-medium">Tổng lượt tim</p>
+                <p className="text-2xl font-black text-rose-600 mt-1">
+                  {wishes.reduce((acc, curr) => acc + (curr.likes || 0), 0)}
+                </p>
+              </div>
+            </div>
           </div>
-          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
-            <p className="text-xs text-slate-500 font-medium">Gửi ẩn danh</p>
-            <p className="text-2xl font-black text-amber-600 mt-1">
-              {wishes.filter((w) => w.is_anonymous).length}
-            </p>
-          </div>
-          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
-            <p className="text-xs text-slate-500 font-medium">Tổng lượt tim</p>
-            <p className="text-2xl font-black text-rose-600 mt-1">
-              {wishes.reduce((acc, curr) => acc + (curr.likes || 0), 0)}
-            </p>
-          </div>
+
         </div>
 
         {/* Tab Selector */}
@@ -423,6 +566,18 @@ export default function AdminDashboard({ wishes, onRefreshWishes, onBackToSite, 
           >
             <Tv className="w-4 h-4 text-amber-500" />
             <span>Trình Chiếu TV / Hội Trường 📽️</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('analytics')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs md:text-sm font-bold transition cursor-pointer ${
+              activeTab === 'analytics'
+                ? 'bg-gradient-to-r from-teal-800 to-indigo-800 text-white shadow-xs'
+                : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+            }`}
+          >
+            <BarChart3 className="w-4 h-4 text-teal-500" />
+            <span>Phân Tích Truy Cập ({visitorStats.totalVisits}) 📊</span>
           </button>
 
           {isAdmin && (
@@ -985,6 +1140,268 @@ export default function AdminDashboard({ wishes, onRefreshWishes, onBackToSite, 
                   </span>
                 </div>
 
+              </div>
+            </div>
+
+          </div>
+        )}
+
+        {/* TAB 4: PHÂN TÍCH LƯU LƯỢNG TRUY CẬP (ANALYTICS) */}
+        {activeTab === 'analytics' && (
+          <div className="space-y-6">
+            
+            {/* Banner giới thiệu phân tích */}
+            <div className="bg-gradient-to-br from-slate-900 via-teal-950 to-indigo-950 text-white p-6 md:p-8 rounded-3xl border border-slate-800 shadow-xl space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-5">
+                <div>
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/20 text-teal-300 border border-teal-500/30 text-xs font-bold mb-2">
+                    <Activity className="w-3.5 h-3.5 text-teal-400" />
+                    <span>Thống Kê Truy Cập Thời Gian Thực</span>
+                  </div>
+                  <h2 className="text-xl md:text-2xl font-black tracking-tight">
+                    Trung Tâm Phân Tích Khách & Thiết Bị Truy Cập
+                  </h2>
+                  <p className="text-xs md:text-sm text-slate-300 mt-1 max-w-2xl">
+                    Đo lường số lượng sinh viên, thầy cô và khách mở trang web gửi lời chúc 20/11 qua Supabase Realtime Presence & Database Counter.
+                  </p>
+                </div>
+
+                <button
+                  onClick={loadVisitorStatsData}
+                  disabled={isLoadingStats}
+                  className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs border border-white/20 transition cursor-pointer self-start sm:self-auto disabled:opacity-50"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${isLoadingStats ? 'animate-spin' : ''}`} />
+                  <span>{isLoadingStats ? 'Đang cập nhật...' : 'Làm mới số liệu'}</span>
+                </button>
+              </div>
+
+              {/* 3 chỉ số chuyên sâu */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs pt-1">
+                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-1">
+                  <p className="text-slate-400">Tần suất xem trang trung bình</p>
+                  <p className="text-xl font-black text-teal-300">
+                    {visitorStats.uniqueVisitors > 0
+                      ? (visitorStats.totalVisits / visitorStats.uniqueVisitors).toFixed(1)
+                      : '1.0'}{' '}
+                    <span className="text-xs font-normal text-slate-400">lượt / người</span>
+                  </p>
+                  <p className="text-[11px] text-slate-400 leading-relaxed">
+                    Mỗi khách truy cập trung bình mở và tương tác web hơn 1 lần.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-1">
+                  <p className="text-slate-400">Tỉ lệ chuyển đổi gửi lời chúc</p>
+                  <p className="text-xl font-black text-amber-300">
+                    {visitorStats.uniqueVisitors > 0
+                      ? `${Math.min(100, Math.round((wishes.length / visitorStats.uniqueVisitors) * 100))}%`
+                      : '0%'}{' '}
+                    <span className="text-xs font-normal text-slate-400">({wishes.length} thiệp)</span>
+                  </p>
+                  <p className="text-[11px] text-slate-400 leading-relaxed">
+                    Tỉ lệ số người truy cập hoàn tất viết và gửi thiệp tri ân.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-1">
+                  <p className="text-slate-400">Thiết bị phổ biến nhất</p>
+                  <div className="text-xl font-black text-indigo-300 flex items-center gap-1.5">
+                    {visitorStats.mobileVisits >= visitorStats.desktopVisits ? (
+                      <>
+                        <Smartphone className="w-5 h-5 text-emerald-400" />
+                        <span>Điện thoại ({visitorStats.totalVisits > 0 ? Math.round((visitorStats.mobileVisits / visitorStats.totalVisits) * 100) : 0}%)</span>
+                      </>
+                    ) : (
+                      <>
+                        <Monitor className="w-5 h-5 text-indigo-400" />
+                        <span>Máy tính ({visitorStats.totalVisits > 0 ? Math.round((visitorStats.desktopVisits / visitorStats.totalVisits) * 100) : 0}%)</span>
+                      </>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-slate-400 leading-relaxed">
+                    Thiết bị chính sinh viên dùng để quét QR và gửi lời chúc.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Phân bổ Thiết bị & Trạng thái Realtime */}
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+              
+              {/* Cột trái: Phân bổ thiết bị */}
+              <div className="md:col-span-7 bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                  <h3 className="font-bold text-slate-900 text-sm md:text-base flex items-center gap-2">
+                    <BarChart3 className="w-4 h-4 text-indigo-600" />
+                    <span>Cơ Cấu Thiết Bị Truy Cập</span>
+                  </h3>
+                  <span className="text-xs text-slate-400">Tổng: {visitorStats.totalVisits} lượt</span>
+                </div>
+
+                {/* Thanh tiến trình phân bổ thiết bị */}
+                {(() => {
+                  const total = Math.max(1, visitorStats.totalVisits);
+                  const mobilePct = Math.round((visitorStats.mobileVisits / total) * 100);
+                  const desktopPct = 100 - mobilePct;
+                  return (
+                    <div className="space-y-4">
+                      <div>
+                        <div className="flex justify-between text-xs font-bold mb-1.5">
+                          <span className="text-emerald-700 flex items-center gap-1">
+                            <Smartphone className="w-3.5 h-3.5" />
+                            <span>Điện thoại (Mobile): {mobilePct}%</span>
+                          </span>
+                          <span className="text-indigo-700 flex items-center gap-1">
+                            <Monitor className="w-3.5 h-3.5" />
+                            <span>Máy tính (Desktop): {desktopPct}%</span>
+                          </span>
+                        </div>
+                        <div className="w-full h-3.5 rounded-full overflow-hidden bg-slate-100 flex p-0.5 border border-slate-200">
+                          <div
+                            className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-l-full transition-all duration-500"
+                            style={{ width: `${mobilePct}%` }}
+                          />
+                          <div
+                            className="h-full bg-gradient-to-r from-indigo-500 to-blue-500 rounded-r-full transition-all duration-500"
+                            style={{ width: `${desktopPct}%` }}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3 pt-2">
+                        <div className="p-3.5 rounded-xl bg-emerald-50/70 border border-emerald-100">
+                          <p className="text-xs text-emerald-800 font-semibold flex items-center gap-1.5">
+                            <Smartphone className="w-4 h-4 text-emerald-600" />
+                            <span>Lượt từ Điện thoại</span>
+                          </p>
+                          <p className="text-xl font-black text-emerald-900 mt-1">{visitorStats.mobileVisits}</p>
+                          <p className="text-[11px] text-emerald-700/80 mt-0.5">Quét mã QR từ điện thoại di động</p>
+                        </div>
+
+                        <div className="p-3.5 rounded-xl bg-indigo-50/70 border border-indigo-100">
+                          <p className="text-xs text-indigo-800 font-semibold flex items-center gap-1.5">
+                            <Monitor className="w-4 h-4 text-indigo-600" />
+                            <span>Lượt từ Máy tính / TV</span>
+                          </p>
+                          <p className="text-xl font-black text-indigo-900 mt-1">{visitorStats.desktopVisits}</p>
+                          <p className="text-[11px] text-indigo-700/80 mt-0.5">Laptop, PC và màn hình chiếu TV</p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+
+              {/* Cột phải: Hướng dẫn & mẹo theo dõi */}
+              <div className="md:col-span-5 bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-3.5">
+                <h3 className="font-bold text-slate-900 text-sm md:text-base flex items-center gap-2 pb-3 border-b border-slate-100">
+                  <TrendingUp className="w-4 h-4 text-teal-600" />
+                  <span>Cách Hoạt Động & Cơ Chế Đếm</span>
+                </h3>
+
+                <ul className="space-y-2.5 text-xs text-slate-600 leading-relaxed">
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-600 font-bold">✓</span>
+                    <span>
+                      <b>Đang trực tuyến:</b> Đo lường qua kết nối thời gian thực WebSocket (Presence). Khi sinh viên mở tab web thì số đếm tăng, khi đóng tab số đếm tự giảm.
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-indigo-600 font-bold">✓</span>
+                    <span>
+                      <b>Người truy cập (Unique):</b> Phân biệt từng thiết bị qua mã ẩn danh riêng biệt trong trình duyệt, giúp BTC nắm chính xác có bao nhiêu người thực tế đã ghé thăm.
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-teal-600 font-bold">✓</span>
+                    <span>
+                      <b>Chống đếm ảo (Anti-spam):</b> Tự động lọc các thao tác F5 liên tục trong thời gian ngắn để số liệu luôn chính xác và trung thực.
+                    </span>
+                  </li>
+                </ul>
+
+                <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-600">
+                  💡 <b>Mẹo sự kiện:</b> Trong giờ cao điểm buổi lễ 20/11, bạn có thể bấm <b>Cập nhật số liệu</b> bất kỳ lúc nào hoặc để nguyên trang web tự động làm mới mỗi 30 giây!
+                </div>
+              </div>
+
+            </div>
+
+            {/* Bảng lịch sử 15 lượt truy cập gần nhất */}
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+              <div className="p-4 border-b border-slate-100 flex items-center justify-between">
+                <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
+                  <Activity className="w-4 h-4 text-teal-600" />
+                  <span>Lịch Sử 15 Lượt Truy Cập Gần Nhất</span>
+                </h3>
+                <span className="text-xs text-slate-400">Tự động cập nhật</span>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-50 text-slate-700 uppercase font-bold border-b border-slate-200">
+                    <tr>
+                      <th className="p-3 pl-5">Thiết Bị</th>
+                      <th className="p-3">Phân Loại Khách</th>
+                      <th className="p-3">Mục Đang Xem</th>
+                      <th className="p-3 pr-5 text-right">Thời Gian</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {visitorStats.recentVisits.length === 0 ? (
+                      <tr>
+                        <td colSpan={4} className="p-6 text-center text-slate-400 italic">
+                          Chưa có lượt truy cập mới nào được ghi nhận.
+                        </td>
+                      </tr>
+                    ) : (
+                      visitorStats.recentVisits.map((v) => (
+                        <tr key={v.id} className="hover:bg-slate-50/80 transition">
+                          <td className="p-3 pl-5 font-semibold text-slate-800 whitespace-nowrap">
+                            <span className="inline-flex items-center gap-1.5">
+                              {v.device === 'mobile' ? (
+                                <>
+                                  <Smartphone className="w-4 h-4 text-emerald-600" />
+                                  <span>Điện thoại (Mobile)</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Monitor className="w-4 h-4 text-indigo-600" />
+                                  <span>Máy tính (Desktop)</span>
+                                </>
+                              )}
+                            </span>
+                          </td>
+                          <td className="p-3 whitespace-nowrap">
+                            <span
+                              className={`px-2 py-0.5 rounded-md text-[11px] font-bold ${
+                                v.isUnique
+                                  ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                                  : 'bg-slate-100 text-slate-700'
+                              }`}
+                            >
+                              {v.isUnique ? '🌟 Khách mới' : '🔄 Khách quay lại'}
+                            </span>
+                          </td>
+                          <td className="p-3 font-mono text-slate-500">
+                            {v.path === '#present'
+                              ? '📽️ Trình chiếu TV (#present)'
+                              : v.path === '#admin'
+                              ? '🛡️ Trang quản trị (#admin)'
+                              : v.path === '#feed'
+                              ? '💌 Danh sách thiệp (#feed)'
+                              : '📝 Trang gửi lời chúc (/)'}
+                          </td>
+                          <td className="p-3 pr-5 text-right text-slate-400 whitespace-nowrap">
+                            {new Date(v.createdAt).toLocaleTimeString('vi-VN')} •{' '}
+                            {new Date(v.createdAt).toLocaleDateString('vi-VN')}
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
               </div>
             </div>
 

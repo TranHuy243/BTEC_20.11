@@ -5,7 +5,13 @@ import WishFeed from './components/WishFeed';
 import CardModal from './components/CardModal';
 import AdminDashboard from './components/AdminDashboard';
 import LivePresentationView from './components/LivePresentationView';
-import { getWishes, isSupabaseConfigured, supabase } from './lib/supabase';
+import {
+  getWishes,
+  isSupabaseConfigured,
+  supabase,
+  recordSiteVisit,
+  subscribeOnlinePresence
+} from './lib/supabase';
 
 export default function App() {
   const getRouteView = () => {
@@ -25,6 +31,18 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedWishForModal, setSelectedWishForModal] = useState(null);
   const [isNewlySubmitted, setIsNewlySubmitted] = useState(false);
+  const [onlineCount, setOnlineCount] = useState(1);
+
+  // Ghi nhận lượt truy cập web & lắng nghe số người online Realtime
+  useEffect(() => {
+    recordSiteVisit();
+    const unsubscribePresence = subscribeOnlinePresence((count) => {
+      setOnlineCount(count);
+    });
+    return () => {
+      if (unsubscribePresence) unsubscribePresence();
+    };
+  }, []);
 
   // Lắng nghe thay đổi hash URL (ví dụ: #admin, #present, hoặc chuyển trang)
   useEffect(() => {
@@ -135,6 +153,7 @@ export default function App() {
     return (
       <AdminDashboard
         wishes={wishes}
+        onlineCount={onlineCount}
         onRefreshWishes={loadWishes}
         onBackToSite={backToSite}
         onOpenLivePresentation={(newTab = false) => {

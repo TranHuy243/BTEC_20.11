@@ -227,17 +227,17 @@ export async function getModerators() {
       const { data, error } = await supabase
         .from('moderators')
         .select('*')
-        .neq('role', 'tv_config')
+        .eq('role', 'moderator')
         .order('created_at', { ascending: false });
 
       if (!error && data) {
-        return { data: data.filter((m) => m.role !== 'tv_config'), source: 'supabase' };
+        return { data: data.filter((m) => m.role === 'moderator'), source: 'supabase' };
       }
     } catch (err) {}
   }
 
   return {
-    data: getLocalModerators().filter((m) => m.role !== 'tv_config'),
+    data: getLocalModerators().filter((m) => m.role === 'moderator'),
     source: 'local'
   };
 }
@@ -531,5 +531,224 @@ export function subscribePresentationSettings(onUpdate) {
     window.removeEventListener('storage', handleStorage);
     clearInterval(pollTimer);
     broadcastListeners.delete(handleBroadcast);
+  };
+}
+
+/**
+ * ============================================================================
+ * THEO DÕI VÀ THỐNG KÊ LƯỢT TRUY CẬP TRANG WEB (SITE VISITS & REALTIME ONLINE)
+ * ============================================================================
+ */
+const SITE_VISIT_ROLE = 'site_visit';
+
+/**
+ * Ghi nhận lượt truy cập trang web (hỗ trợ phân biệt Khách mới vs Khách quay lại, Mobile vs Desktop)
+ */
+export async function recordSiteVisit() {
+  if (typeof window === 'undefined') return { success: false };
+
+  try {
+    // 1. Sinh hoặc lấy Visitor ID duy nhất từ localStorage
+    let visitorId = localStorage.getItem('btec_visitor_id');
+    let isNewUnique = false;
+    if (!visitorId) {
+      visitorId = 'v_' + Math.random().toString(36).slice(2, 9) + Date.now().toString(36);
+      localStorage.setItem('btec_visitor_id', visitorId);
+      isNewUnique = true;
+    }
+
+    // 2. Kiểm tra session để tránh ghi nhận liên tục khi người dùng F5 nhanh trong 30 giây
+    const lastVisitTime = parseInt(sessionStorage.getItem('btec_last_session_visit') || '0', 10);
+    const now = Date.now();
+    if (lastVisitTime && now - lastVisitTime < 30000) {
+      return { success: true, throttled: true };
+    }
+    sessionStorage.setItem('btec_last_session_visit', String(now));
+
+    // 3. Nhận diện thiết bị (Mobile vs Desktop) và đường dẫn truy cập
+    const isMobile =
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+      window.innerWidth < 768;
+
+    const path = window.location.hash || '/';
+
+    const visitData = {
+      device: isMobile ? 'mobile' : 'desktop',
+      isUnique: isNewUnique,
+      path: path.slice(0, 50)
+    };
+
+    // 4. Lưu cục bộ dự phòng vào localStorage
+    try {
+      const localTotal = parseInt(localStorage.getItem('btec_local_total_visits') || '0', 10) + 1;
+      localStorage.setItem('btec_local_total_visits', String(localTotal));
+      if (isNewUnique) {
+        const localUnique = parseInt(localStorage.getItem('btec_local_unique_visitors') || '0', 10) + 1;
+        localStorage.setItem('btec_local_unique_visitors', String(localUnique));
+      }
+    } catch {}
+
+    // 5. Gửi lên Supabase
+    if (isSupabaseConfigured && supabase) {
+      await supabase.from('moderators').insert([
+        {
+          name: visitorId,
+          pin_code: JSON.stringify(visitData),
+          role: SITE_VISIT_ROLE,
+          created_at: new Date().toISOString()
+        }
+      ]);
+    }
+
+    return { success: true };
+  } catch (err) {
+    console.warn('Lỗi ghi nhận lượt truy cập:', err);
+    return { success: false };
+  }
+}
+
+/**
+ * Lấy số liệu thống kê truy cập đầy đủ cho trang Admin:
+ * - Tổng lượt truy cập (Total Visits)
+ * - Số người truy cập duy nhất (Unique Visitors)
+ * - Lượt truy cập hôm nay (Today Visits)
+ * - Phân bổ thiết bị: Mobile vs Desktop
+ * - Lịch sử các lượt truy cập gần nhất
+ */
+export async function getVisitorStats() {
+  const fallback = {
+    totalVisits: parseInt(localStorage.getItem('btec_local_total_visits') || '1', 10),
+    uniqueVisitors: parseInt(localStorage.getItem('btec_local_unique_visitors') || '1', 10),
+    todayVisits: 1,
+    mobileVisits: 0,
+    desktopVisits: 1,
+    recentVisits: []
+  };
+
+  if (!isSupabaseConfigured || !supabase) {
+    return { data: fallback, source: 'local' };
+  }
+
+  try {
+    // 1. Tổng lượt truy cập (chỉ lấy count để tối ưu tốc độ mạng)
+    const { count: totalVisits } = await supabase
+      .from('moderators')
+      .select('id', { count: 'exact', head: true })
+      .eq('role', SITE_VISIT_ROLE);
+
+    // 2. Số người truy cập duy nhất
+    const { count: uniqueVisitors } = await supabase
+      .from('moderators')
+      .select('id', { count: 'exact', head: true })
+      .eq('role', SITE_VISIT_ROLE)
+      .like('pin_code', '%"isUnique":true%');
+
+    // 3. Lượt truy cập trong ngày hôm nay
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+    const { count: todayVisits } = await supabase
+      .from('moderators')
+      .select('id', { count: 'exact', head: true })
+      .eq('role', SITE_VISIT_ROLE)
+      .gte('created_at', startOfToday.toISOString());
+
+    // 4. Lượt truy cập qua Mobile
+    const { count: mobileVisits } = await supabase
+      .from('moderators')
+      .select('id', { count: 'exact', head: true })
+      .eq('role', SITE_VISIT_ROLE)
+      .like('pin_code', '%"device":"mobile"%');
+
+    // 5. 15 lượt truy cập gần nhất để xem chi tiết
+    const { data: recentRows } = await supabase
+      .from('moderators')
+      .select('id, name, pin_code, created_at')
+      .eq('role', SITE_VISIT_ROLE)
+      .order('created_at', { ascending: false })
+      .limit(15);
+
+    const safeTotal = Math.max(0, totalVisits || 0);
+    const safeUnique = Math.max(safeTotal > 0 ? 1 : 0, uniqueVisitors || 0);
+    const safeMobile = Math.min(safeTotal, mobileVisits || 0);
+    const safeDesktop = Math.max(0, safeTotal - safeMobile);
+
+    const recentVisits = (recentRows || []).map((r) => {
+      let meta = {};
+      try {
+        meta = JSON.parse(r.pin_code || '{}');
+      } catch {}
+      return {
+        id: r.id,
+        visitorId: r.name,
+        device: meta.device || 'desktop',
+        isUnique: Boolean(meta.isUnique),
+        path: meta.path || '/',
+        createdAt: r.created_at
+      };
+    });
+
+    return {
+      data: {
+        totalVisits: safeTotal,
+        uniqueVisitors: safeUnique,
+        todayVisits: todayVisits || 0,
+        mobileVisits: safeMobile,
+        desktopVisits: safeDesktop,
+        recentVisits
+      },
+      source: 'supabase'
+    };
+  } catch (err) {
+    console.warn('Lỗi đọc thống kê truy cập Supabase:', err);
+    return { data: fallback, source: 'local' };
+  }
+}
+
+/**
+ * Đếm số người đang online thời gian thực qua Supabase Realtime Presence
+ */
+export function subscribeOnlinePresence(onCountChange) {
+  if (typeof window === 'undefined') return () => {};
+
+  if (!isSupabaseConfigured || !supabase) {
+    onCountChange(1);
+    return () => {};
+  }
+
+  const visitorKey =
+    localStorage.getItem('btec_visitor_id') ||
+    `guest_${Math.random().toString(36).slice(2, 8)}`;
+
+  const channel = supabase.channel('btec_online_presence', {
+    config: {
+      presence: { key: visitorKey }
+    }
+  });
+
+  channel
+    .on('presence', { event: 'sync' }, () => {
+      const state = channel.presenceState();
+      const count = Object.keys(state).length;
+      onCountChange(Math.max(1, count));
+    })
+    .subscribe(async (status) => {
+      if (status === 'SUBSCRIBED') {
+        const isMobile =
+          /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+          window.innerWidth < 768;
+        try {
+          await channel.track({
+            device: isMobile ? 'mobile' : 'desktop',
+            path: window.location.hash || '/',
+            onlineAt: new Date().toISOString()
+          });
+        } catch {}
+      }
+    });
+
+  return () => {
+    try {
+      supabase.removeChannel(channel);
+    } catch {}
   };
 }
